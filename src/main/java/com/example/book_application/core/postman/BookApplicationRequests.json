@@ -1,0 +1,315 @@
+{
+  "info": {
+    "name": "Book Application API",
+    "description": "API endpoints for Book Application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Create Book",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/books",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Clean Code\",\n  \"author\": \"Robert C. Martin\",\n  \"filePath\": \"/books/clean-code.pdf\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Book by Title",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/books/Clean Code",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Books",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/books",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/users",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get User by Email",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/users/john@example.com",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/users",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Words",
+      "item": [
+        {
+          "name": "Create Word",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/words",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wordText\": \"algorithm\",\n  \"language\": \"en\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Word by Text",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/words/algorithm",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Words",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/words",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Translations",
+      "item": [
+        {
+          "name": "Create Translation",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/translations/word/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"translatedText\": \"algoritma\",\n  \"targetLanguage\": \"tr\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Translations by Word ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/translations/word/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Translations",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/translations",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pronunciations",
+      "item": [
+        {
+          "name": "Create Pronunciation",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/pronunciations",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"audioUrl\": \"https://example.com/audio/algorithm.mp3\",\n  \"language\": \"en\",\n  \"wordId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Pronunciations by Word ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/pronunciations/word/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Pronunciations",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/pronunciations",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Saved Words",
+      "item": [
+        {
+          "name": "Save Word",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/saved-words",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"bookId\": 1,\n  \"wordId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Saved Words by User",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/saved-words/user/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get All Saved Words",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/saved-words",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test",
+      "item": [
+        {
+          "name": "Hello World Test",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/hello",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+} 
