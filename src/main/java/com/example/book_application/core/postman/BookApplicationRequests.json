@@ -29,7 +29,50 @@
           "name": "Get Book by Title",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/books/Clean Code",
+            "url": "http://localhost:8080/api/books/title/Clean Code",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/books/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Book",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/books/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Clean Code: Updated\",\n  \"author\": \"Robert C. Martin\",\n  \"filePath\": \"/books/clean-code-updated.pdf\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Book",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/books/1",
             "header": [
               {
                 "key": "Content-Type",
@@ -77,7 +120,50 @@
           "name": "Get User by Email",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/users/john@example.com",
+            "url": "http://localhost:8080/api/users/email/john@example.com",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/users/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/users/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe_updated\",\n  \"email\": \"john_updated@example.com\",\n  \"password\": \"newpassword123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/users/1",
             "header": [
               {
                 "key": "Content-Type",
@@ -125,7 +211,50 @@
           "name": "Get Word by Text",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/words/algorithm",
+            "url": "http://localhost:8080/api/words/text/algorithm",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Word by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/words/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Word",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/words/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wordText\": \"algorithm_updated\",\n  \"language\": \"en\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Word",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/words/1",
             "header": [
               {
                 "key": "Content-Type",
@@ -183,6 +312,49 @@
           }
         },
         {
+          "name": "Get Translation by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/translations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Translation",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/translations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"translatedText\": \"algoritma_updated\",\n  \"targetLanguage\": \"tr\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Translation",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/translations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
           "name": "Get All Translations",
           "request": {
             "method": "GET",
@@ -231,6 +403,49 @@
           }
         },
         {
+          "name": "Get Pronunciation by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/pronunciations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Pronunciation",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/pronunciations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"audioUrl\": \"https://example.com/audio/algorithm_updated.mp3\",\n  \"language\": \"en\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Pronunciation",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/pronunciations/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
           "name": "Get All Pronunciations",
           "request": {
             "method": "GET",
@@ -270,6 +485,49 @@
           "request": {
             "method": "GET",
             "url": "http://localhost:8080/api/saved-words/user/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Saved Word by ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/saved-words/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Saved Word",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/saved-words/1",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"bookId\": 2,\n  \"wordId\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Saved Word",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/saved-words/1",
             "header": [
               {
                 "key": "Content-Type",

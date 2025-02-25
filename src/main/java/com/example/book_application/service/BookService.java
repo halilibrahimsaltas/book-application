@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.book_application.model.Book;
 import com.example.book_application.repository.BookRepository;
+import com.example.book_application.core.excepiton.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,5 +36,22 @@ public class BookService {
 
     public List<Book> findAllBooks() {
         return bookRepository.findAll();
+    }
+
+    public Book findById(Long id) {
+        return bookRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+    }
+
+    public Book updateBook(Long id, Book bookDetails) {
+        Book book = findById(id);
+        book.setTitle(bookDetails.getTitle());
+        book.setAuthor(bookDetails.getAuthor());
+        return bookRepository.save(book);
+    }
+
+    public void deleteBook(Long id) {
+        Book book = findById(id);
+        bookRepository.delete(book);
     }
 }

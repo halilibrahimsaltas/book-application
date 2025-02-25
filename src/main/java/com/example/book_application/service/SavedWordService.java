@@ -1,6 +1,7 @@
 package com.example.book_application.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import com.example.book_application.repository.UserRepository;
 import com.example.book_application.repository.WordRepository;
 import com.example.book_application.repository.BookRepository;
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
+import com.example.book_application.dto.SavedWordResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,4 +62,64 @@ public class SavedWordService {
             throw e;
         }
     }
+
+    public SavedWord findById(Long id) {
+        return savedWordRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Saved word not found with id: " + id));
+    }
+
+    public SavedWord updateSavedWord(Long id, SavedWord savedWordDetails) {
+        SavedWord savedWord = findById(id);
+        savedWord.setWord(savedWordDetails.getWord());
+        savedWord.setBook(savedWordDetails.getBook());
+        return savedWordRepository.save(savedWord);
+    }
+
+    public void deleteSavedWord(Long id) {
+        SavedWord savedWord = findById(id);
+        savedWordRepository.delete(savedWord);
+    }
+
+    public SavedWordResponse findByIdAsDTO(Long id) {
+        SavedWord savedWord = findById(id);
+        return convertToDTO(savedWord);
+    }
+
+    public List<SavedWordResponse> findAllSavedWordsAsDTO() {
+        return findAllSavedWords().stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public List<SavedWordResponse> findByUserIdAsDTO(Long userId) {
+        return findByUserId(userId).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    private SavedWordResponse convertToDTO(SavedWord savedWord) {
+        SavedWordResponse dto = new SavedWordResponse();
+        dto.setId(savedWord.getId());
+        
+        SavedWordResponse.UserDTO userDTO = new SavedWordResponse.UserDTO();
+        userDTO.setId(savedWord.getUser().getId());
+        userDTO.setUsername(savedWord.getUser().getUsername());
+        userDTO.setEmail(savedWord.getUser().getEmail());
+        dto.setUser(userDTO);
+        
+        SavedWordResponse.BookDTO bookDTO = new SavedWordResponse.BookDTO();
+        bookDTO.setId(savedWord.getBook().getId());
+        bookDTO.setTitle(savedWord.getBook().getTitle());
+        bookDTO.setAuthor(savedWord.getBook().getAuthor());
+        dto.setBook(bookDTO);
+        
+        SavedWordResponse.WordDTO wordDTO = new SavedWordResponse.WordDTO();
+        wordDTO.setId(savedWord.getWord().getId());
+        wordDTO.setWordText(savedWord.getWord().getWordText());
+        wordDTO.setLanguage(savedWord.getWord().getLanguage());
+        dto.setWord(wordDTO);
+        
+        return dto;
+    }
+
 }

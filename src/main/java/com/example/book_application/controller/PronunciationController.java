@@ -2,18 +2,13 @@ package com.example.book_application.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.book_application.model.Pronunciation;
 import com.example.book_application.service.PronunciationService;
-
-
+import com.example.book_application.model.Word;
+import com.example.book_application.service.WordService;
+import com.example.book_application.dto.PronunciationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,17 +18,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PronunciationController {
 
-    @Autowired
-    private PronunciationService pronunciationService;
+    private final PronunciationService pronunciationService;
+    private final WordService wordService;
 
-    // Save a pronunciation
     @PostMapping
-    public Pronunciation createPronunciation(@RequestBody Pronunciation pronunciation) {
-        log.info("Creating pronunciation for word: {}", pronunciation.getWord().getWordText());
-        return pronunciationService.savePronunciation(pronunciation);
+    public Pronunciation createPronunciation(@RequestBody PronunciationRequest request) {
+        try {
+            log.info("Creating pronunciation for word ID: {}", request.getWordId());
+            Word word = wordService.findById(request.getWordId());
+            
+            Pronunciation pronunciation = new Pronunciation();
+            pronunciation.setWord(word);
+            pronunciation.setAudioUrl(request.getAudioUrl());
+            pronunciation.setLanguage(request.getLanguage());
+            
+            return pronunciationService.savePronunciation(pronunciation);
+        } catch (Exception e) {
+            log.error("Error creating pronunciation: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    // Get pronunciations by word ID
     @GetMapping("/word/{wordId}")
     public List<Pronunciation> getPronunciationsByWordId(@PathVariable Long wordId) {
         log.info("Fetching pronunciations for word ID: {}", wordId);
@@ -46,4 +51,21 @@ public class PronunciationController {
         return pronunciationService.findAllPronunciations();
     }
 
+    @GetMapping("/{id}")
+    public Pronunciation getPronunciationById(@PathVariable Long id) {
+        log.info("Fetching pronunciation with ID: {}", id);
+        return pronunciationService.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Pronunciation updatePronunciation(@PathVariable Long id, @RequestBody Pronunciation pronunciation) {
+        log.info("Updating pronunciation with ID: {}", id);
+        return pronunciationService.updatePronunciation(id, pronunciation);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePronunciation(@PathVariable Long id) {
+        log.info("Deleting pronunciation with ID: {}", id);
+        pronunciationService.deletePronunciation(id);
+    }
 }

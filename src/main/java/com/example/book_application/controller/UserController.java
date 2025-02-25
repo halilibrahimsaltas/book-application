@@ -24,15 +24,32 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser( @RequestBody User user) {
+    public User createUser(@RequestBody User user) {
         log.info("Creating user: {}", user.getEmail());
         return userService.saveUser(user);
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public User getUserByEmail(@PathVariable String email) {
         log.info("Fetching user by email: {}", email);
         return userService.findByEmail(email);
     }
 
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        log.info("Fetching user with ID: {}", id);
+        return userService.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+        log.info("Updating user with ID: {}", id);
+        return userService.updateUser(id, user);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        log.info("Deleting user with ID: {}", id);
+        userService.deleteUser(id);
+    }
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.book_application.model.Word;
 import com.example.book_application.repository.WordRepository;
-
+import com.example.book_application.core.excepiton.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,5 +35,21 @@ public class WordService {
 
     public List<Word> findAllWords() {
         return wordRepository.findAll();
+    }
+
+    public Word findById(Long id) {
+        return wordRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Word not found with id: " + id));
+    }
+
+    public Word updateWord(Long id, Word wordDetails) {
+        Word word = findById(id);
+        word.setWordText(wordDetails.getWordText());
+        return wordRepository.save(word);
+    }
+
+    public void deleteWord(Long id) {
+        Word word = findById(id);
+        wordRepository.delete(word);
     }
 }

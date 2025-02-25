@@ -41,4 +41,8 @@ public class Word {
     @JsonManagedReference
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
     private List<Pronunciation> pronunciations = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
+    private List<SavedWord> savedWords = new ArrayList<>();
 }

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.book_application.model.Translation;
 import com.example.book_application.repository.TranslationRepository;
 import com.example.book_application.repository.WordRepository;
-
+import com.example.book_application.core.excepiton.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,4 +47,22 @@ public class TranslationService {
     public List<Translation> findAllTranslations() {
         return translationRepository.findAll();
     }
+
+    public Translation findById(Long id) {
+        return translationRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Translation not found with id: " + id));
+    }
+
+    public Translation updateTranslation(Long id, Translation translationDetails) {
+        Translation translation = findById(id);
+        translation.setTranslatedText(translationDetails.getTranslatedText());
+        return translationRepository.save(translation);
+    }
+
+    public void deleteTranslation(Long id) {
+        Translation translation = findById(id);
+        translationRepository.delete(translation);
+    }
+    
+
 }

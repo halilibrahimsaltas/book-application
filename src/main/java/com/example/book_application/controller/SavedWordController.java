@@ -2,17 +2,18 @@ package com.example.book_application.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.book_application.model.SavedWord;
 import com.example.book_application.service.SavedWordService;    
-
-
+import com.example.book_application.model.User;
+import com.example.book_application.model.Book;
+import com.example.book_application.model.Word;
+import com.example.book_application.service.UserService;
+import com.example.book_application.service.BookService;
+import com.example.book_application.service.WordService;
+import com.example.book_application.dto.SavedWordRequest;
+import com.example.book_application.dto.SavedWordResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,11 +24,24 @@ import lombok.extern.slf4j.Slf4j;
 public class SavedWordController {
 
     private final SavedWordService savedWordService;
+    private final UserService userService;
+    private final BookService bookService;
+    private final WordService wordService;
 
     @PostMapping
-    public SavedWord saveWord(@RequestBody SavedWord savedWord) {
+    public SavedWord saveWord(@RequestBody SavedWordRequest request) {
         try {
-            log.info("Saving word for user: {}", savedWord.getUser().getUsername());
+            log.info("Saving word for user ID: {}", request.getUserId());
+            
+            User user = userService.findById(request.getUserId());
+            Book book = bookService.findById(request.getBookId());
+            Word word = wordService.findById(request.getWordId());
+            
+            SavedWord savedWord = new SavedWord();
+            savedWord.setUser(user);
+            savedWord.setBook(book);
+            savedWord.setWord(word);
+            
             return savedWordService.saveSavedWord(savedWord);
         } catch (Exception e) {
             log.error("Error saving word: {}", e.getMessage());
@@ -36,19 +50,37 @@ public class SavedWordController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<SavedWord> getSavedWordsByUser(@PathVariable Long userId) {
+    public List<SavedWordResponse> getSavedWordsByUser(@PathVariable Long userId) {
         log.info("Fetching saved words for user ID: {}", userId);
-        return savedWordService.findByUserId(userId);
+        return savedWordService.findByUserIdAsDTO(userId);
     }
 
     @GetMapping
-    public List<SavedWord> getAllSavedWords() {
+    public List<SavedWordResponse> getAllSavedWords() {
         try {
             log.info("Fetching all saved words");
-            return savedWordService.findAllSavedWords();
+            return savedWordService.findAllSavedWordsAsDTO();
         } catch (Exception e) {
             log.error("Error fetching saved words: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @GetMapping("/{id}")
+    public SavedWordResponse getSavedWordById(@PathVariable Long id) {
+        log.info("Fetching saved word with ID: {}", id);
+        return savedWordService.findByIdAsDTO(id);
+    }
+
+    @PutMapping("/{id}")
+    public SavedWord updateSavedWord(@PathVariable Long id, @RequestBody SavedWord savedWord) {
+        log.info("Updating saved word with ID: {}", id);
+        return savedWordService.updateSavedWord(id, savedWord);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteSavedWord(@PathVariable Long id) {
+        log.info("Deleting saved word with ID: {}", id);
+        savedWordService.deleteSavedWord(id);
     }
 }

@@ -1,11 +1,6 @@
 package com.example.book_application.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
 import com.example.book_application.model.Book;
@@ -29,8 +24,9 @@ public class BookController {
         return bookService.saveBook(book);
     }
 
-    @GetMapping("/{title}")
+    @GetMapping("/title/{title}")
     public Book getBookByTitle(@PathVariable String title) {
+        log.info("Fetching book by title: {}", title);
         Book book = bookService.findByTitle(title);
         if (book == null) {
             throw new ResourceNotFoundException("Book not found with title: " + title);
@@ -42,5 +38,23 @@ public class BookController {
     public List<Book> getAllBooks() {
         log.info("Fetching all books");
         return bookService.findAllBooks();
+    }
+
+    @GetMapping("/{id}")
+    public Book getBookById(@PathVariable Long id) {
+        log.info("Fetching book with ID: {}", id);
+        return bookService.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
+        log.info("Updating book with ID: {}", id);
+        return bookService.updateBook(id, book);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBook(@PathVariable Long id) {
+        log.info("Deleting book with ID: {}", id);
+        bookService.deleteBook(id);
     }
 }
