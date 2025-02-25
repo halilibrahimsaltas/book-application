@@ -84,6 +84,14 @@ public class UserService implements UserDetailsService {
         User user = findById(id);
         userRepository.delete(user);
     }
-    
-    
+
+    public User login(String username, String password) {
+        log.info("Attempting login for user: {}", username);
+        return userRepository.findByUsername(username)
+            .filter(user -> passwordEncoder.matches(password, user.getPassword()))
+            .orElseThrow(() -> {
+                log.warn("Login failed for user: {}", username);
+                return new RuntimeException("Invalid credentials");
+            });
+    }
 }

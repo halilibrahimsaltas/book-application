@@ -1,11 +1,14 @@
 package com.example.book_application.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import com.example.book_application.model.User;
 import com.example.book_application.service.UserService;
+import com.example.book_application.dto.LoginRequest;
+import com.example.book_application.dto.LoginResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,5 +54,16 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         log.info("Deleting user with ID: {}", id);
         userService.deleteUser(id);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            User user = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
+            LoginResponse response = new LoginResponse(user.getId(), user.getUsername(), user.getEmail());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid credentials");
+        }
     }
 }
