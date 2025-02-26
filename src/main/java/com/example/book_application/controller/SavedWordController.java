@@ -3,6 +3,8 @@ package com.example.book_application.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.book_application.model.SavedWord;
 import com.example.book_application.service.SavedWordService;    
@@ -31,9 +33,12 @@ public class SavedWordController {
     @PostMapping
     public SavedWord saveWord(@RequestBody SavedWordRequest request) {
         try {
-            log.info("Saving word for user ID: {}", request.getUserId());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User user = userService.findByUsername(username);
             
-            User user = userService.findById(request.getUserId());
+            log.info("Saving word for user: {}", username);
+            
             Book book = bookService.findById(request.getBookId());
             Word word = wordService.findById(request.getWordId());
             
@@ -82,5 +87,13 @@ public class SavedWordController {
     public void deleteSavedWord(@PathVariable Long id) {
         log.info("Deleting saved word with ID: {}", id);
         savedWordService.deleteSavedWord(id);
+    }
+
+    @GetMapping("/user")
+    public List<SavedWordResponse> getCurrentUserSavedWords() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        return savedWordService.findByUserIdAsDTO(user.getId());
     }
 }

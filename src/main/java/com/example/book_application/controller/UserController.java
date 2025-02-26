@@ -3,6 +3,8 @@ package com.example.book_application.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
 import com.example.book_application.model.User;
@@ -65,5 +67,12 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }
+    }
+
+    @GetMapping("/profile")
+    public User getCurrentUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userService.findByUsername(username);
     }
 }

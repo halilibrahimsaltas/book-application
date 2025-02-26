@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SavedWordRequest {
-    private Long userId;
     private Long bookId;
     private Long wordId;
 }

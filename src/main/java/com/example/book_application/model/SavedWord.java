@@ -12,7 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -29,17 +29,17 @@ public class SavedWord {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private Book book;
 
     @ManyToOne
     @JoinColumn(name = "word_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private Word word;
 
     @CreationTimestamp

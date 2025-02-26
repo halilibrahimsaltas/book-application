@@ -687,11 +687,12 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"wordId\": 1,\n  \"bookId\": 1\n}"
-            }
+            },
+            "description": "Mevcut kullanıcı için kelime kaydetme"
           }
         },
         {
-          "name": "Get User's Saved Words",
+          "name": "Get Current User's Saved Words",
           "request": {
             "method": "GET",
             "url": "http://localhost:8081/api/saved-words/user",
@@ -704,7 +705,8 @@
                 "key": "Accept",
                 "value": "application/json"
               }
-            ]
+            ],
+            "description": "Mevcut kullanıcının kaydettiği kelimeleri getir"
           }
         },
         {
@@ -717,7 +719,8 @@
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
               }
-            ]
+            ],
+            "description": "ID'ye göre kaydedilmiş kelimeyi getir"
           }
         },
         {
@@ -737,8 +740,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"bookId\": 2,\n  \"wordId\": 2\n}"
-            }
+              "raw": "{\n  \"bookId\": 2,\n  \"wordId\": 2\n}"
+            },
+            "description": "Kaydedilmiş kelimeyi güncelle"
           }
         },
         {
@@ -751,7 +755,8 @@
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
               }
-            ]
+            ],
+            "description": "Kaydedilmiş kelimeyi sil"
           }
         },
         {
@@ -764,7 +769,8 @@
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
               }
-            ]
+            ],
+            "description": "Tüm kaydedilmiş kelimeleri getir"
           }
         }
       ]
