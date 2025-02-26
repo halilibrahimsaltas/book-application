@@ -9,31 +9,36 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Form submit'i engellemek için
+    e.preventDefault();
     try {
-      const response = await api.post("/users/login", {
+      const response = await api.post("/auth/login", {
         username,
         password,
       });
       
-      // Login başarılı
+      // Token'ı localStorage'a kaydet
+      localStorage.setItem('token', response.data.token);
+      
+      // API isteklerinde Authorization header'ını otomatik ekle
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      
       console.log("Login successful:", response.data);
       navigate("/dashboard");
     } catch (error) {
-      setError("Login failed. Please check your credentials.");
+      setError("Giriş başarısız. Lütfen kullanıcı adı ve şifrenizi kontrol edin.");
       console.error("Login error:", error);
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Giriş Yap</h2>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleLogin}>
         <div>
           <input
             type="text"
-            placeholder="Username"
+            placeholder="Kullanıcı Adı"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -41,12 +46,12 @@ const LoginPage = () => {
         <div>
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Şifre"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit">Giriş Yap</button>
       </form>
     </div>
   );
