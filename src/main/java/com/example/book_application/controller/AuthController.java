@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +23,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtConfig jwtConfig;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) {
-    user.setPassword(passwordEncoder.encode(user.getPassword())); // ✅ Hash password
-    User savedUser = userService.saveUser(user);
-    
-    String token = jwtConfig.generateToken(userService.loadUserByUsername(savedUser.getUsername()));
-    return ResponseEntity.ok(new AuthResponse(token));
-}
+        User savedUser = userService.saveUser(user);
+        String token = jwtConfig.generateToken(userService.loadUserByUsername(savedUser.getUsername()));
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
