@@ -1,15 +1,13 @@
 package com.example.book_application.service;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
 import com.example.book_application.model.User;
@@ -17,54 +15,86 @@ import com.example.book_application.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User saveUser(User user) {
-        log.info("Creating new user with email: {}", user.getEmail());
+        log.info("Yeni kullanıcı kaydediliyor: {}", user.getUsername());
+        
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            log.error("Bu kullanıcı adı zaten kullanımda: {}", user.getUsername());
+            throw new RuntimeException("Bu kullanıcı adı zaten kullanımda");
+        }
+        
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            log.error("Bu email zaten kullanımda: {}", user.getEmail());
+            throw new RuntimeException("Bu email zaten kullanımda");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        log.info("Kullanıcı başarıyla kaydedildi: {}", savedUser.getUsername());
+        
+        return savedUser;
     }
 
-    @Cacheable(value = "users", key = "#email", unless = "#result == null")
-    public User findByEmail(String email) {
-        log.info("Fetching user from database by email: {}", email);
-        return userRepository.findByEmail(email)
+    public User login(String username, String password) {
+        log.info("Kullanıcı girişi deneniyor: {}", username);
+        
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
-                log.warn("User not found with email: {}", email);
-                return new ResourceNotFoundException("User not found with email: " + email);
+                log.error("Kullanıcı bulunamadı: {}", username);
+                return new RuntimeException("Geçersiz kullanıcı adı veya şifre");
             });
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.error("Şifre eşleşmedi: {}", username);
+            throw new RuntimeException("Geçersiz kullanıcı adı veya şifre");
+        }
+
+        log.info("Kullanıcı başarıyla giriş yaptı: {}", username);
+        return user;
     }
 
     @Override
-    @Cacheable(value = "userDetails", key = "#email", unless = "#result == null")
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("Loading user details from database: {}", email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Kullanıcı yükleniyor: {}", username);
+        
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("Kullanıcı bulunamadı: {}", username);
+                    return new UsernameNotFoundException("Kullanıcı bulunamadı: " + username);
+                });
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Kullanıcı bulunamadı: " + username));
+    }
+
+    public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-            .map(user -> {
-                log.debug("User found: {}", user.getEmail());
-                return new org.springframework.security.core.userdetails.User(
-                    user.getEmail(),
-                    user.getPassword(),
-                    Collections.emptyList()
-                );
-            })
-            .orElseThrow(() -> {
-                log.warn("Authentication failed - user not found: {}", email);
-                return new UsernameNotFoundException("User not found with email: " + email);
-            });
+                .orElseThrow(() -> new ResourceNotFoundException("Email ile kullanıcı bulunamadı: " + email));
     }
 
     public List<User> findAllUsers() {
-        log.info("Fetching all users");
         return userRepository.findAll();
     }
 
@@ -76,22 +106,14 @@ public class UserService implements UserDetailsService {
     public User updateUser(Long id, User userDetails) { 
         User user = findById(id);
         user.setEmail(userDetails.getEmail());
-        user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        if (userDetails.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        }
         return userRepository.save(user);
     }   
 
     public void deleteUser(Long id) {
         User user = findById(id);
         userRepository.delete(user);
-    }
-
-    public User login(String username, String password) {
-        log.info("Attempting login for user: {}", username);
-        return userRepository.findByUsername(username)
-            .filter(user -> passwordEncoder.matches(password, user.getPassword()))
-            .orElseThrow(() -> {
-                log.warn("Login failed for user: {}", username);
-                return new RuntimeException("Invalid credentials");
-            });
     }
 }

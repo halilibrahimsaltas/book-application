@@ -1,10 +1,127 @@
 {
   "info": {
     "name": "Book Application API",
-    "description": "API endpoints for Book Application",
+    "description": "API endpoints for Book Application with JWT Authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8081/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "auth", "register"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "description": "Yeni kullanıcı kaydı oluşturur ve JWT token döner"
+          },
+          "response": [
+            {
+              "name": "Successful Registration",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "http://localhost:8081/api/auth/register"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            },
+            {
+              "name": "Registration Error - Username Exists",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "http://localhost:8081/api/auth/register"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": {
+                "error": "Bu kullanıcı adı zaten kullanımda"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8081/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "auth", "login"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "description": "Kullanıcı girişi yapar ve JWT token döner"
+          },
+          "response": [
+            {
+              "name": "Successful Login",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "http://localhost:8081/api/auth/login"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            },
+            {
+              "name": "Login Error - Invalid Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "http://localhost:8081/api/auth/login"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "body": {
+                "error": "Geçersiz kullanıcı adı veya şifre"
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Books",
       "item": [
@@ -12,10 +129,18 @@
           "name": "Create Book",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8080/api/books",
+            "url": "http://localhost:8081/api/books",
             "header": [
               {
                 "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ],
@@ -26,13 +151,17 @@
           }
         },
         {
-          "name": "Get Book by Title",
+          "name": "Get All Books",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/books/title/Clean Code",
+            "url": "http://localhost:8081/api/books",
             "header": [
               {
-                "key": "Content-Type",
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ]
@@ -42,11 +171,28 @@
           "name": "Get Book by ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/books/1",
+            "url": "http://localhost:8081/api/books/1",
             "header": [
               {
-                "key": "Content-Type",
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Book by Title",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8081/api/books/title/Clean Code",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -55,11 +201,15 @@
           "name": "Update Book",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/books/1",
+            "url": "http://localhost:8081/api/books/1",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -72,24 +222,11 @@
           "name": "Delete Book",
           "request": {
             "method": "DELETE",
-            "url": "http://localhost:8080/api/books/1",
+            "url": "http://localhost:8081/api/books/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get All Books",
-          "request": {
-            "method": "GET",
-            "url": "http://localhost:8080/api/books",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -143,19 +280,44 @@
           }
         },
         {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8081/api/users/profile",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
           "name": "Update User",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/users/1",
+            "url": "http://localhost:8081/api/users/profile",
             "header": [
               {
                 "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"johndoe_updated\",\n  \"email\": \"john_updated@example.com\",\n  \"password\": \"newpassword123\"\n}"
+              "raw": "{\n  \"username\": \"updated_user\",\n  \"email\": \"updated@example.com\",\n  \"password\": \"newpassword123\"\n}"
             }
           }
         },
@@ -194,10 +356,18 @@
           "name": "Create Word",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8080/api/words",
+            "url": "http://localhost:8081/api/words",
             "header": [
               {
                 "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ],
@@ -211,11 +381,11 @@
           "name": "Get Word by Text",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/words/text/algorithm",
+            "url": "http://localhost:8081/api/words/text/algorithm",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -224,11 +394,11 @@
           "name": "Get Word by ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/words/1",
+            "url": "http://localhost:8081/api/words/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -237,11 +407,15 @@
           "name": "Update Word",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/words/1",
+            "url": "http://localhost:8081/api/words/1",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -254,11 +428,11 @@
           "name": "Delete Word",
           "request": {
             "method": "DELETE",
-            "url": "http://localhost:8080/api/words/1",
+            "url": "http://localhost:8081/api/words/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -267,10 +441,14 @@
           "name": "Get All Words",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/words",
+            "url": "http://localhost:8081/api/words",
             "header": [
               {
-                "key": "Content-Type",
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ]
@@ -285,27 +463,39 @@
           "name": "Create Translation",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8080/api/translations/word/1",
+            "url": "http://localhost:8081/api/translations",
             "header": [
               {
                 "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"translatedText\": \"algoritma\",\n  \"targetLanguage\": \"tr\"\n}"
+              "raw": "{\n  \"wordId\": 1,\n  \"translatedText\": \"algoritma\",\n  \"targetLanguage\": \"tr\"\n}"
             }
           }
         },
         {
-          "name": "Get Translations by Word ID",
+          "name": "Get Word Translations",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/translations/word/1",
+            "url": "http://localhost:8081/api/translations/word/1",
             "header": [
               {
-                "key": "Content-Type",
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ]
@@ -315,11 +505,11 @@
           "name": "Get Translation by ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/translations/1",
+            "url": "http://localhost:8081/api/translations/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -328,11 +518,15 @@
           "name": "Update Translation",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/translations/1",
+            "url": "http://localhost:8081/api/translations/1",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -345,11 +539,11 @@
           "name": "Delete Translation",
           "request": {
             "method": "DELETE",
-            "url": "http://localhost:8080/api/translations/1",
+            "url": "http://localhost:8081/api/translations/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -358,11 +552,11 @@
           "name": "Get All Translations",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/translations",
+            "url": "http://localhost:8081/api/translations",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -376,11 +570,15 @@
           "name": "Create Pronunciation",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8080/api/pronunciations",
+            "url": "http://localhost:8081/api/pronunciations",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -393,11 +591,11 @@
           "name": "Get Pronunciations by Word ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/pronunciations/word/1",
+            "url": "http://localhost:8081/api/pronunciations/word/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -406,11 +604,11 @@
           "name": "Get Pronunciation by ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/pronunciations/1",
+            "url": "http://localhost:8081/api/pronunciations/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -419,11 +617,15 @@
           "name": "Update Pronunciation",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/pronunciations/1",
+            "url": "http://localhost:8081/api/pronunciations/1",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -436,11 +638,11 @@
           "name": "Delete Pronunciation",
           "request": {
             "method": "DELETE",
-            "url": "http://localhost:8080/api/pronunciations/1",
+            "url": "http://localhost:8081/api/pronunciations/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -449,11 +651,11 @@
           "name": "Get All Pronunciations",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/pronunciations",
+            "url": "http://localhost:8081/api/pronunciations",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -467,27 +669,39 @@
           "name": "Save Word",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8080/api/saved-words",
+            "url": "http://localhost:8081/api/saved-words",
             "header": [
               {
                 "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"bookId\": 1,\n  \"wordId\": 1\n}"
+              "raw": "{\n  \"wordId\": 1,\n  \"bookId\": 1\n}"
             }
           }
         },
         {
-          "name": "Get Saved Words by User",
+          "name": "Get User's Saved Words",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/saved-words/user/1",
+            "url": "http://localhost:8081/api/saved-words/user",
             "header": [
               {
-                "key": "Content-Type",
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Accept",
                 "value": "application/json"
               }
             ]
@@ -497,11 +711,11 @@
           "name": "Get Saved Word by ID",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/saved-words/1",
+            "url": "http://localhost:8081/api/saved-words/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -510,11 +724,15 @@
           "name": "Update Saved Word",
           "request": {
             "method": "PUT",
-            "url": "http://localhost:8080/api/saved-words/1",
+            "url": "http://localhost:8081/api/saved-words/1",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
@@ -527,11 +745,11 @@
           "name": "Delete Saved Word",
           "request": {
             "method": "DELETE",
-            "url": "http://localhost:8080/api/saved-words/1",
+            "url": "http://localhost:8081/api/saved-words/1",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -540,11 +758,11 @@
           "name": "Get All Saved Words",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8080/api/saved-words",
+            "url": "http://localhost:8081/api/saved-words",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
             ]
           }
@@ -568,6 +786,35 @@
           }
         }
       ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.response.code === 200 && pm.response.json().token) {",
+          "    pm.environment.set('jwt_token', pm.response.json().token);",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
     }
   ]
 } 
