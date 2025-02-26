@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import BookReader from "./pages/BookReader";
 
 const Router = () => (
   <BrowserRouter>
@@ -9,6 +10,7 @@ const Router = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/books/:id/read" element={<BookReader />} />
     </Routes>
   </BrowserRouter>
 );

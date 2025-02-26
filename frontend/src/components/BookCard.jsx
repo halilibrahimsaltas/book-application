@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import './BookCard.css';
+import { useNavigate } from 'react-router-dom';
 
 const BookIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" className="book-icon">
@@ -16,6 +17,8 @@ const WordIcon = () => (
 );
 
 const BookCard = ({ book, onViewSavedWords }) => {
+  const navigate = useNavigate();
+
   // Tarih formatlamak için yardımcı fonksiyon
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -27,7 +30,7 @@ const BookCard = ({ book, onViewSavedWords }) => {
   };
 
   const handleCardClick = () => {
-    window.open(`/api/books/${book.id}/view-pdf`, '_blank');
+    navigate(`/books/${book.id}/read`);
   };
 
   return (

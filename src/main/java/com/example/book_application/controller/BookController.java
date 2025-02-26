@@ -1,6 +1,7 @@
 package com.example.book_application.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.io.IOException;
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/books")
@@ -21,6 +24,8 @@ import java.io.File;
 public class BookController {
 
     private final BookService bookService;
+
+    private static final String UPLOAD_DIR = "uploads/pdfs/";
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Book createBook(
@@ -34,20 +39,22 @@ public class BookController {
             throw new IllegalArgumentException("File cannot be empty");
         }
         
-        // Geçici dosya oluştur
-        File tempFile = File.createTempFile("upload_", ".pdf");
-        try {
-            file.transferTo(tempFile);
-            return bookService.saveBook(book, tempFile.getPath());
-        } catch (Exception e) {
-            log.error("Error saving book: {}", e.getMessage());
-            throw e;
-        } finally {
-            // İşlem bitince geçici dosyayı sil
-            if (tempFile.exists()) {
-                tempFile.delete();
-            }
+        // Yükleme dizinini oluştur
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
         }
+
+        // Benzersiz dosya adı oluştur
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String filePath = UPLOAD_DIR + fileName;
+
+        // Dosyayı kaydet
+        File dest = new File(filePath);
+        file.transferTo(dest);
+
+        log.info("PDF file saved to: {}", filePath);
+        return bookService.saveBook(book, filePath);
     }
 
     @GetMapping("/title/{title}")
@@ -82,5 +89,23 @@ public class BookController {
     public void deleteBook(@PathVariable Long id) {
         log.info("Deleting book with ID: {}", id);
         bookService.deleteBook(id);
+    }
+
+    @GetMapping("/{id}/content")
+    public ResponseEntity<Map<String, Object>> getBookContent(
+            @PathVariable Long id,
+            @RequestParam(required = false) Integer page) {
+        try {
+            Map<String, Object> response = bookService.getBookContentWithProgress(id, page);
+            return ResponseEntity.ok(response);
+        } catch (ResourceNotFoundException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(404).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error processing book content: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 }

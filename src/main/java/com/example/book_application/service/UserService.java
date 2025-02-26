@@ -2,6 +2,8 @@ package com.example.book_application.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -115,5 +117,11 @@ public class UserService implements UserDetailsService {
     public void deleteUser(Long id) {
         User user = findById(id);
         userRepository.delete(user);
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return findByUsername(username);
     }
 }

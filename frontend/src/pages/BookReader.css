@@ -1,0 +1,219 @@
+/* Ana konteyner */
+.book-reader {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Başlık bölümü */
+.book-reader-header {
+    margin-bottom: 3rem;
+    text-align: center;
+    position: relative;
+    padding: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.book-reader-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.author {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+/* Geri butonu */
+.back-button {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.8rem 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* İçerik alanı */
+.book-content {
+    line-height: 1.8;
+    font-size: 1.2rem;
+    color: #34495e;
+    margin-bottom: 3rem;
+    text-align: justify;
+    padding: 0 2rem;
+    font-family: 'Georgia', serif;
+}
+
+.book-content p {
+    margin-bottom: 1.5rem;
+    text-indent: 2em;
+}
+
+/* Sayfalama */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    position: sticky;
+    bottom: 2rem;
+}
+
+.pagination button {
+    padding: 0.8rem 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.pagination button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.pagination span {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Yükleme ve hata durumları */
+.loading, .error {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    margin: 2rem;
+}
+
+.loading {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+}
+
+.error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Responsive tasarım */
+@media (max-width: 768px) {
+    .book-reader {
+        padding: 1rem;
+    }
+
+    .book-content {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+
+    .book-reader-header h1 {
+        font-size: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .back-button {
+        top: 1rem;
+        transform: none;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pagination button {
+        width: 100%;
+    }
+}
+
+/* Karanlık mod desteği */
+@media (prefers-color-scheme: dark) {
+    .book-reader {
+        background-color: #1a1a1a;
+    }
+
+    .book-reader-header h1 {
+        color: #e5e5e5;
+    }
+
+    .author {
+        color: #a0a0a0;
+    }
+
+    .book-content {
+        color: #e5e5e5;
+    }
+
+    .pagination {
+        background-color: #2d2d2d;
+    }
+
+    .pagination span {
+        background-color: #3d3d3d;
+        color: #e5e5e5;
+    }
+
+    .loading {
+        background-color: #2d2d2d;
+        color: #e5e5e5;
+    }
+}
+
+/* Özel scroll bar */
+.book-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.book-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.book-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.book-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+} 
