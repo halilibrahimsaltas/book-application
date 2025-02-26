@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import com.example.book_application.model.Book;
 import com.example.book_application.repository.BookRepository;
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
+import com.example.book_application.core.util.PdfExtractor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -19,9 +21,10 @@ public class BookService {
 
     private final BookRepository bookRepository;
 
-    public Book saveBook(Book book) {
-        Book savedBook = bookRepository.save(book);
-        return savedBook;
+    public Book saveBook(Book book, String pdfPath) throws IOException {
+        book.setFilePath(pdfPath);
+        book.setContent(PdfExtractor.extractTextFromPdf(pdfPath)); // ✅ Extract text
+        return bookRepository.save(book);
     }
 
 

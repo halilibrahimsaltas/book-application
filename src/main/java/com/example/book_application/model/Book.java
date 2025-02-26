@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import jakarta.persistence.Lob;
 @Entity
 @Table(name = "books")
 @Data
@@ -36,10 +36,12 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
+    @Column
+    private String filePath; // PDF dosya yolunu saklamak için yeni alan
 
-
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String content; // ✅ Store extracted text
 
     @CreationTimestamp
     @Column(name = "created_at")

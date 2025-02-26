@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from '../api/axios';
 
@@ -8,6 +8,14 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Sayfa yüklendiğinde token kontrolü yap
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -16,16 +24,26 @@ const LoginPage = () => {
         password,
       });
       
-      // Token'ı localStorage'a kaydet
-      localStorage.setItem('token', response.data.token);
-      
-      // API isteklerinde Authorization header'ını otomatik ekle
-      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      
-      console.log("Login successful:", response.data);
-      navigate("/dashboard");
+      if (response.data.token) {
+        // Token'ı localStorage'a kaydet
+        localStorage.setItem('token', response.data.token);
+        
+        // Kullanıcıyı dashboard'a yönlendir
+        navigate("/dashboard");
+      } else {
+        setError("Token alınamadı. Lütfen tekrar deneyin.");
+      }
     } catch (error) {
-      setError("Giriş başarısız. Lütfen kullanıcı adı ve şifrenizi kontrol edin.");
+      if (error.response) {
+        // Sunucudan gelen hata mesajını göster
+        setError(error.response.data.message || "Giriş başarısız. Lütfen kullanıcı adı ve şifrenizi kontrol edin.");
+      } else if (error.request) {
+        // Sunucuya ulaşılamadı
+        setError("Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.");
+      } else {
+        // Diğer hatalar
+        setError("Bir hata oluştu. Lütfen tekrar deneyin.");
+      }
       console.error("Login error:", error);
     }
   };
@@ -41,6 +59,7 @@ const LoginPage = () => {
             placeholder="Kullanıcı Adı"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
           />
         </div>
         <div>
@@ -49,6 +68,7 @@ const LoginPage = () => {
             placeholder="Şifre"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
         <button type="submit">Giriş Yap</button>

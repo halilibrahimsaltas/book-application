@@ -9,10 +9,12 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // React'in default portu
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        registry.addMapping("/**") // Tüm endpoint'ler için CORS yapılandırması
+                .allowedOrigins("http://localhost:5174", "http://localhost:5173")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .exposedHeaders("Authorization")
+                .allowCredentials(true)
+                .maxAge(3600); // 1 saat önbellek
     }
 } 
