@@ -13,7 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "words")
@@ -34,15 +34,15 @@ public class Word {
     @Column(nullable = false)
     private String language;
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
     private List<Translation> translations = new ArrayList<>();
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
     private List<Pronunciation> pronunciations = new ArrayList<>();
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
     private List<SavedWord> savedWords = new ArrayList<>();
 }
