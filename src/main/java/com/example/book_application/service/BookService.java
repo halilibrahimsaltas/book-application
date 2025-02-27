@@ -8,7 +8,6 @@ import com.example.book_application.core.excepiton.ResourceNotFoundException;
 import com.example.book_application.core.util.PdfExtractor;
 import com.example.book_application.model.BookProgress;
 import com.example.book_application.repository.BookProgressRepository;
-import com.example.book_application.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

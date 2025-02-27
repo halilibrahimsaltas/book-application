@@ -25,7 +25,7 @@ public class BookController {
 
     private final BookService bookService;
 
-    private static final String UPLOAD_DIR = "uploads/pdfs/";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/pdfs/";
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Book createBook(
@@ -34,27 +34,31 @@ public class BookController {
         
         log.info("Creating book: {}", book.getTitle());
         
-        // Dosya boyutu kontrolü
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty");
+            throw new IllegalArgumentException("Dosya boş olamaz");
         }
         
-        // Yükleme dizinini oluştur
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                throw new IOException("Yükleme dizini oluşturulamadı: " + UPLOAD_DIR);
+            }
+            log.info("Upload directory created: {}", UPLOAD_DIR);
         }
 
-        // Benzersiz dosya adı oluştur
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("\\s+", "_");
         String filePath = UPLOAD_DIR + fileName;
 
-        // Dosyayı kaydet
         File dest = new File(filePath);
-        file.transferTo(dest);
-
-        log.info("PDF file saved to: {}", filePath);
-        return bookService.saveBook(book, filePath);
+        try {
+            file.transferTo(dest);
+            log.info("PDF file saved to: {}", filePath);
+            return bookService.saveBook(book, filePath);
+        } catch (IOException e) {
+            log.error("Dosya kaydedilirken hata oluştu: {}", e.getMessage());
+            throw new IOException("Dosya kaydedilemedi: " + e.getMessage());
+        }
     }
 
     @GetMapping("/title/{title}")
