@@ -54,7 +54,7 @@ const Dashboard = () => {
       setShowAddBook(false);
       setNewBook({ title: '', author: '' });
       setSelectedFile(null);
-      fetchBooks(); // Kitap listesini yenile
+      fetchBooks();
     } catch (error) {
       setError('Kitap kaydedilirken bir hata oluştu.');
       console.error("Error saving book:", error);
@@ -63,7 +63,6 @@ const Dashboard = () => {
 
   const handleSaveWord = async (bookId) => {
     try {
-      // Kelime kaydetme işlemi için yeni endpoint'e yönlendirme yapılacak
       navigate(`/books/${bookId}/words`);
     } catch (error) {
       console.error("Error navigating to word save page:", error);
@@ -76,7 +75,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div className="dashboard-loading">Yükleniyor...</div>;
+    return <div className="dashboard-loading">Kitaplar yükleniyor...</div>;
   }
 
   if (error) {
@@ -87,12 +86,14 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Kitaplık</h1>
-        <button onClick={() => setShowAddBook(!showAddBook)} className="add-book-button">
-          {showAddBook ? 'İptal' : 'Yeni Kitap Ekle'}
-        </button>
-        <button onClick={handleLogout} className="logout-button">
-          Çıkış Yap
-        </button>
+        <div className="header-buttons">
+          <button onClick={() => setShowAddBook(!showAddBook)} className="add-book-button">
+            {showAddBook ? 'İptal' : 'Yeni Kitap Ekle'}
+          </button>
+          <button onClick={handleLogout} className="logout-button">
+            Çıkış Yap
+          </button>
+        </div>
       </header>
 
       {showAddBook && (
@@ -114,7 +115,7 @@ const Dashboard = () => {
             accept=".pdf"
             onChange={(e) => setSelectedFile(e.target.files[0])}
           />
-          <button type="submit">Kaydet</button>
+          <button type="submit">Kitabı Kaydet</button>
         </form>
       )}
 
@@ -130,7 +131,7 @@ const Dashboard = () => {
 
       {books.length === 0 && !loading && (
         <div className="no-books-message">
-          Henüz kitap eklenmemiş.
+          Henüz kitap eklenmemiş. Yeni kitap eklemek için "Yeni Kitap Ekle" butonuna tıklayın.
         </div>
       )}
     </div>

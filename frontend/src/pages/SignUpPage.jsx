@@ -1,64 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from '../api/axios';
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Sayfa yüklendiğinde token kontrolü yap
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/dashboard');
-    }
-  }, [navigate]);
-
-  const handleLogin = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/auth/login", {
+      const response = await api.post("/auth/register", {
         username,
         password,
+        email,
       });
       
       if (response.data.token) {
-        // Token'ı localStorage'a kaydet
         localStorage.setItem('token', response.data.token);
-        
-        // Kullanıcıyı dashboard'a yönlendir
         navigate("/dashboard");
       } else {
-        setError("Token alınamadı. Lütfen tekrar deneyin.");
+        setError("Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin.");
       }
     } catch (error) {
       if (error.response) {
-        // Sunucudan gelen hata mesajını göster
-        setError(error.response.data.message || "Giriş başarısız. Lütfen kullanıcı adı ve şifrenizi kontrol edin.");
+        setError(error.response.data.message || "Kayıt işlemi başarısız oldu.");
       } else if (error.request) {
-        // Sunucuya ulaşılamadı
         setError("Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.");
       } else {
-        // Diğer hatalar
         setError("Bir hata oluştu. Lütfen tekrar deneyin.");
       }
-      console.error("Login error:", error);
+      console.error("SignUp error:", error);
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Giriş Yap</h2>
+      <h2>Kayıt Ol</h2>
       {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSignUp}>
         <div>
           <input
             type="text"
             placeholder="Kullanıcı Adı"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="email"
+            placeholder="E-posta"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -71,13 +68,13 @@ const LoginPage = () => {
             required
           />
         </div>
-        <button type="submit">Giriş Yap</button>
+        <button type="submit">Kayıt Ol</button>
       </form>
       <p className="auth-link">
-        Hesabınız yok mu? <Link to="/signup">Kayıt Ol</Link>
+        Zaten hesabınız var mı? <Link to="/login">Giriş Yap</Link>
       </p>
     </div>
   );
 };
 
-export default LoginPage;
+export default SignUpPage; 
