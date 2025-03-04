@@ -170,3 +170,16 @@
         width: 100%;
     }
 }
+
+.clickable-word {
+    cursor: pointer;
+    display: inline-block;
+    padding: 0 2px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.clickable-word:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #2196f3;
+}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import './BookReader.css';
+import WordCard from '../components/WordCard';
 
 const BookReader = () => {
     const { id } = useParams();
@@ -11,6 +12,8 @@ const BookReader = () => {
     const [error, setError] = useState(null);
     const [book, setBook] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
+    const [selectedWord, setSelectedWord] = useState(null);
+    const [wordCardPosition, setWordCardPosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         fetchBookDetails();
@@ -46,6 +49,19 @@ const BookReader = () => {
         }
     };
 
+    const handleWordClick = (event, word) => {
+        const rect = event.target.getBoundingClientRect();
+        setWordCardPosition({
+            x: rect.left,
+            y: rect.bottom + window.scrollY
+        });
+        setSelectedWord(word);
+    };
+
+    const closeWordCard = () => {
+        setSelectedWord(null);
+    };
+
     if (loading) {
         return <div className="book-reader-loading">Yükleniyor...</div>;
     }
@@ -65,10 +81,28 @@ const BookReader = () => {
             </div>
 
             <div className="book-content">
-                {bookContent[currentPage]?.split('\n').map((paragraph, index) => (
-                    <p key={index}>{paragraph.trim()}</p>
+                {bookContent[currentPage]?.split('\n').map((paragraph, pIndex) => (
+                    <p key={pIndex}>
+                        {paragraph.trim().split(/\s+/).map((word, wIndex) => (
+                            <span
+                                key={`${pIndex}-${wIndex}`}
+                                className="clickable-word"
+                                onClick={(e) => handleWordClick(e, word)}
+                            >
+                                {word}{' '}
+                            </span>
+                        ))}
+                    </p>
                 ))}
             </div>
+
+            {selectedWord && (
+                <WordCard
+                    word={selectedWord}
+                    onClose={closeWordCard}
+                    position={wordCardPosition}
+                />
+            )}
 
             <div className="page-controls">
                 <button onClick={goToPreviousPage} disabled={currentPage === 0}>Önceki Sayfa</button>
