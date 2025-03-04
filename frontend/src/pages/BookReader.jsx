@@ -101,6 +101,7 @@ const BookReader = () => {
                     word={selectedWord}
                     onClose={closeWordCard}
                     position={wordCardPosition}
+                    bookId={id}
                 />
             )}
 
