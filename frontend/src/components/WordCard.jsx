@@ -6,10 +6,13 @@ const WordCard = ({ word, onClose, position, bookId }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState(null);
     const [wordData, setWordData] = useState({
-        meaning: '',
-        pronunciation: ''
+        word: '',
+        type: '',
+        category: '',
+        tr: ''
     });
     const [isLoading, setIsLoading] = useState(true);
+    const [wordExists, setWordExists] = useState(false);
 
     useEffect(() => {
         fetchWordDetails();
@@ -18,31 +21,42 @@ const WordCard = ({ word, onClose, position, bookId }) => {
     const fetchWordDetails = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get(`/api/words/text/${encodeURIComponent(word)}`);
+            const response = await api.get(`/api/words/search/${encodeURIComponent(word)}`);
             if (response.data) {
                 setWordData({
-                    meaning: response.data.meaning || 'Anlam bulunamadı',
-                    pronunciation: response.data.pronunciation || 'Telaffuz bulunamadı'
+                    word: response.data.word || word,
+                    type: response.data.type || 'Tür bilgisi yok',
+                    category: response.data.category || 'Kategori bilgisi yok',
+                    tr: response.data.tr || 'Çeviri bulunamadı'
                 });
+                setWordExists(true);
             }
         } catch (error) {
             console.log('Kelime bulunamadı, varsayılan değerler kullanılıyor');
             setWordData({
-                meaning: 'Anlam bulunamadı',
-                pronunciation: 'Telaffuz bulunamadı'
+                word: word,
+                type: 'Tür bilgisi yok',
+                category: 'Kategori bilgisi yok',
+                tr: 'Çeviri bulunamadı'
             });
+            setWordExists(false);
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleSaveWord = async () => {
+        if (!wordExists) {
+            setSaveError('Bu kelime veritabanında bulunmadığı için kaydedilemez.');
+            return;
+        }
+
         try {
             setIsSaving(true);
             setSaveError(null);
             
-            await api.post('/saved-words', {
-                word: word,
+            await api.post('/api/saved-words', {
+                wordId: wordData.id,
                 bookId: bookId
             });
             
@@ -65,14 +79,15 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             }}
         >
             <button className="close-button" onClick={onClose}>×</button>
-            <h3>{word}</h3>
+            <h3>{wordData.word}</h3>
             <div className="word-details">
                 {isLoading ? (
                     <p>Yükleniyor...</p>
                 ) : (
                     <>
-                        <p><strong>Anlam:</strong> {wordData.meaning}</p>
-                        <p><strong>Telaffuz:</strong> {wordData.pronunciation}</p>
+                        <p><strong>Türkçe:</strong> {wordData.tr}</p>
+                        <p><strong>Tür:</strong> {wordData.type}</p>
+                        <p><strong>Kategori:</strong> {wordData.category}</p>
                     </>
                 )}
             </div>
@@ -80,11 +95,14 @@ const WordCard = ({ word, onClose, position, bookId }) => {
                 <button 
                     className="save-button" 
                     onClick={handleSaveWord}
-                    disabled={isSaving}
+                    disabled={isSaving || !wordExists}
                 >
-                    {isSaving ? 'Kaydediliyor...' : 'Kelimeyi Kaydet'}
+                    {isSaving ? 'Kaydediliyor...' : (wordExists ? 'Kelimeyi Kaydet' : 'Kelime Bulunamadı')}
                 </button>
                 {saveError && <p className="error-message">{saveError}</p>}
+                {!wordExists && !saveError && (
+                    <p className="info-message">Bu kelime veritabanında bulunmamaktadır.</p>
+                )}
             </div>
         </div>
     );

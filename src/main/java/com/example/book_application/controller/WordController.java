@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.book_application.model.Word;
 import com.example.book_application.service.WordService;
+import com.example.book_application.dto.WordRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +26,20 @@ public class WordController {
     }
 
     @PostMapping
-    public Word createWord(@RequestBody Word word) {
-        log.info("Creating word: {}", word.getWordText());
+    public Word createWord(@RequestBody WordRequest request) {
+        log.info("Creating word: {}", request.getWord());
+        Word word = new Word();
+        word.setWord(request.getWord());
+        word.setType(request.getType());
+        word.setCategory(request.getCategory());
+        word.setTr(request.getTr());
         return wordService.saveWord(word);
     }
 
-    @GetMapping("/text/{wordText}")
-    public Word getWordByText(@PathVariable String wordText) {
-        log.info("Fetching word by text: {}", wordText);
-        return wordService.findByWordText(wordText);
+    @GetMapping("/search/{word}")
+    public Word getWordByText(@PathVariable String word) {
+        log.info("Fetching word by text: {}", word);
+        return wordService.findByWord(word);
     }
 
     @GetMapping("/{id}")
@@ -43,8 +49,13 @@ public class WordController {
     }
 
     @PutMapping("/{id}")
-    public Word updateWord(@PathVariable Long id, @RequestBody Word word) {
+    public Word updateWord(@PathVariable Long id, @RequestBody WordRequest request) {
         log.info("Updating word with ID: {}", id);
+        Word word = new Word();
+        word.setWord(request.getWord());
+        word.setType(request.getType());
+        word.setCategory(request.getCategory());
+        word.setTr(request.getTr());
         return wordService.updateWord(id, word);
     }
 

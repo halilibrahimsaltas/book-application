@@ -356,58 +356,13 @@
           "name": "Create Word",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8081/api/words",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"wordText\": \"algorithm\",\n  \"language\": \"en\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Get Word by Text",
-          "request": {
-            "method": "GET",
-            "url": "http://localhost:8081/api/words/text/algorithm",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Word by ID",
-          "request": {
-            "method": "GET",
-            "url": "http://localhost:8081/api/words/1",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Word",
-          "request": {
-            "method": "PUT",
-            "url": "http://localhost:8081/api/words/1",
+            "url": {
+              "raw": "http://localhost:8081/api/words",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words"]
+            },
             "header": [
               {
                 "key": "Content-Type",
@@ -420,38 +375,117 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"wordText\": \"algorithm_updated\",\n  \"language\": \"en\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Word",
-          "request": {
-            "method": "DELETE",
-            "url": "http://localhost:8081/api/words/1",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              }
-            ]
+              "raw": "{\n  \"word\": \"example\",\n  \"type\": \"noun\",\n  \"category\": \"general\",\n  \"tr\": \"örnek\"\n}"
+            },
+            "description": "Yeni kelime ekler"
           }
         },
         {
           "name": "Get All Words",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8081/api/words",
+            "url": {
+              "raw": "http://localhost:8081/api/words",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words"]
+            },
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Tüm kelimeleri listeler"
+          }
+        },
+        {
+          "name": "Search Word",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8081/api/words/search/example",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words", "search", "example"]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Kelime araması yapar"
+          }
+        },
+        {
+          "name": "Get Word by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8081/api/words/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words", "1"]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "ID'ye göre kelime getirir"
+          }
+        },
+        {
+          "name": "Update Word",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "http://localhost:8081/api/words/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words", "1"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               },
               {
-                "key": "Accept",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
               }
-            ]
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"word\": \"updated_example\",\n  \"type\": \"verb\",\n  \"category\": \"general\",\n  \"tr\": \"güncellenmiş örnek\"\n}"
+            },
+            "description": "Kelimeyi günceller"
+          }
+        },
+        {
+          "name": "Delete Word",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:8081/api/words/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "words", "1"]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Kelimeyi siler"
           }
         }
       ]
@@ -669,7 +703,13 @@
           "name": "Save Word",
           "request": {
             "method": "POST",
-            "url": "http://localhost:8081/api/saved-words",
+            "url": {
+              "raw": "http://localhost:8081/api/saved-words",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "saved-words"]
+            },
             "header": [
               {
                 "key": "Content-Type",
@@ -678,35 +718,33 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"wordId\": 1,\n  \"bookId\": 1\n}"
+              "raw": "{\n  \"bookId\": 1,\n  \"wordId\": 1\n}"
             },
-            "description": "Mevcut kullanıcı için kelime kaydetme"
+            "description": "Kelimeyi kullanıcının listesine kaydeder"
           }
         },
         {
           "name": "Get Current User's Saved Words",
           "request": {
             "method": "GET",
-            "url": "http://localhost:8081/api/saved-words/user",
+            "url": {
+              "raw": "http://localhost:8081/api/saved-words/user",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "saved-words", "user"]
+            },
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{jwt_token}}"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
               }
             ],
-            "description": "Mevcut kullanıcının kaydettiği kelimeleri getir"
+            "description": "Mevcut kullanıcının kaydettiği kelimeleri listeler"
           }
         },
         {

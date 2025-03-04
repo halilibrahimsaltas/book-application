@@ -1,48 +1,28 @@
 package com.example.book_application.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
-import java.util.ArrayList;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "words")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "english_words", indexes = {
+    @Index(name = "idx_word", columnList = "word")
+})
 public class Word {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-  
-    @Column(name = "word_text", nullable = false)
-    private String wordText;
-
-   
     @Column(nullable = false)
-    private String language;
+    private String word;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
-    private List<Translation> translations = new ArrayList<>();
+    private String type;
+    private String category;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
-    private List<Pronunciation> pronunciations = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL)
-    private List<SavedWord> savedWords = new ArrayList<>();
+    @Column(nullable = false)
+    private String tr;
 }

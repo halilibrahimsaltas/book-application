@@ -82,4 +82,12 @@
     font-size: 12px;
     margin-top: 8px;
     text-align: center;
+}
+
+.info-message {
+    color: #2196F3;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+    font-style: italic;
 } 

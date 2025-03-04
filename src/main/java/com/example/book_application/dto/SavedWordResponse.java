@@ -28,7 +28,9 @@ public class SavedWordResponse {
     @Data
     public static class WordDTO {
         private Long id;
-        private String wordText;
-        private String language;
+        private String word;
+        private String type;
+        private String category;
+        private String tr;
     }
 } 

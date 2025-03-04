@@ -20,17 +20,17 @@ public class WordService {
     private WordRepository wordRepository;
 
     public Word saveWord(Word word) {
-        log.info("Saving word: {}", word.getWordText());
+        log.info("Saving word: {}", word.getWord());
         return wordRepository.save(word);
     }
 
-    public Word findByWordText(String wordText) {
-        log.info("Finding word by text: {}", wordText);
-        Word word = wordRepository.findByWordText(wordText);
-        if (word == null) {
-            log.debug("No word found with text: {}", wordText);
+    public Word findByWord(String word) {
+        log.info("Finding word by text: {}", word);
+        Word result = wordRepository.findByWord(word);
+        if (result == null) {
+            log.debug("No word found with text: {}", word);
         }
-        return word;
+        return result;
     }
 
     public List<Word> findAllWords() {
@@ -44,7 +44,10 @@ public class WordService {
 
     public Word updateWord(Long id, Word wordDetails) {
         Word word = findById(id);
-        word.setWordText(wordDetails.getWordText());
+        word.setWord(wordDetails.getWord());
+        word.setType(wordDetails.getType());
+        word.setCategory(wordDetails.getCategory());
+        word.setTr(wordDetails.getTr());
         return wordRepository.save(word);
     }
 

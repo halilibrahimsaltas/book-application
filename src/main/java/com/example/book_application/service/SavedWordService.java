@@ -115,8 +115,10 @@ public class SavedWordService {
         
         SavedWordResponse.WordDTO wordDTO = new SavedWordResponse.WordDTO();
         wordDTO.setId(savedWord.getWord().getId());
-        wordDTO.setWordText(savedWord.getWord().getWordText());
-        wordDTO.setLanguage(savedWord.getWord().getLanguage());
+        wordDTO.setWord(savedWord.getWord().getWord());
+        wordDTO.setType(savedWord.getWord().getType());
+        wordDTO.setCategory(savedWord.getWord().getCategory());
+        wordDTO.setTr(savedWord.getWord().getTr());
         dto.setWord(wordDTO);
         
         return dto;
