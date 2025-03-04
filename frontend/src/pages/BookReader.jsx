@@ -6,16 +6,14 @@ import './BookReader.css';
 const BookReader = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [bookContent, setBookContent] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [bookContent, setBookContent] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [book, setBook] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
         fetchBookDetails();
-        fetchBookContent(1);
     }, [id]);
 
     const fetchBookDetails = async () => {
@@ -24,6 +22,10 @@ const BookReader = () => {
             setError(null);
             const response = await api.get(`/books/${id}`);
             setBook(response.data);
+            
+            // Split content by "=== Page X ==="
+            const formattedContent = response.data.content.split(/=== Page \d+ ===/).filter(text => text.trim() !== "");
+            setBookContent(formattedContent);
         } catch (error) {
             setError(error.response?.data?.error || 'Kitap bilgileri yüklenirken bir hata oluştu.');
             console.error('Error fetching book details:', error);
@@ -32,76 +34,49 @@ const BookReader = () => {
         }
     };
 
-    const fetchBookContent = async (page = null) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await api.get(`/books/${id}/content`, {
-                params: page ? { page } : {}
-            });
-            
-            setBookContent(response.data.content);
-            setCurrentPage(response.data.currentPage);
-            setTotalPages(response.data.totalPages);
-            
-            // İsteğe bağlı: Son okuma zamanını göster
-            if (response.data.lastReadAt) {
-                const lastRead = new Date(response.data.lastReadAt);
-                console.log(`Son okuma: ${lastRead.toLocaleString()}`);
-            }
-        } catch (error) {
-            setError(error.response?.data?.error || 'İçerik yüklenirken bir hata oluştu.');
-            console.error('Error fetching book content:', error);
-        } finally {
-            setLoading(false);
+    const goToNextPage = () => {
+        if (currentPage < bookContent.length - 1) {
+            setCurrentPage(currentPage + 1);
         }
     };
 
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= totalPages) {
-            setCurrentPage(newPage);
-            fetchBookContent(newPage);
+    const goToPreviousPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
         }
     };
 
-    if (loading) return <div className="loading">Yükleniyor...</div>;
-    if (error) return <div className="error">{error}</div>;
+    if (loading) {
+        return <div className="book-reader-loading">Yükleniyor...</div>;
+    }
+
+    if (error) {
+        return <div className="book-reader-error">{error}</div>;
+    }
 
     return (
-        <div className="book-reader">
+        <div className="book-reader-container">
             <div className="book-reader-header">
-                <button onClick={() => navigate('/dashboard')} className="back-button">
-                    ← Geri
-                </button>
-                <h1>{book?.title}</h1>
-                <p className="author">Yazar: {book?.author}</p>
+                <div className="header-content">
+                    <h1>{book?.title}</h1>
+                    <p className="author">{book?.author}</p>
+                </div>
+                <button className="back-button" onClick={() => navigate(-1)}>← Geri</button>
             </div>
 
             <div className="book-content">
-                {bookContent.split('\n').map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
+                {bookContent[currentPage]?.split('\n').map((paragraph, index) => (
+                    <p key={index}>{paragraph.trim()}</p>
                 ))}
             </div>
 
-            <div className="pagination">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    Önceki
-                </button>
-                <span>
-                    Sayfa {currentPage} / {totalPages}
-                </span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    Sonraki
-                </button>
+            <div className="page-controls">
+                <button onClick={goToPreviousPage} disabled={currentPage === 0}>Önceki Sayfa</button>
+                <span>Sayfa {currentPage + 1} / {bookContent.length}</span>
+                <button onClick={goToNextPage} disabled={currentPage === bookContent.length - 1}>Sonraki Sayfa</button>
             </div>
         </div>
     );
 };
 
-export default BookReader; 
+export default BookReader;
