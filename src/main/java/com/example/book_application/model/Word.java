@@ -17,12 +17,15 @@ public class Word {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String word;
 
+    @Column(length = 50)
     private String type;
+
+    @Column(length = 50)
     private String category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String tr;
 }

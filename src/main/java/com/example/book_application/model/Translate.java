@@ -2,27 +2,17 @@ package com.example.book_application.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "saved_word")
+@Table(name = "translate")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SavedWord {
+public class Translate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
 
     @ManyToOne
     @JoinColumn(name = "english_id")
@@ -39,8 +29,4 @@ public class SavedWord {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @CreationTimestamp
-    @Column(name = "saved_date")
-    private LocalDateTime savedDate = LocalDateTime.now();
 }

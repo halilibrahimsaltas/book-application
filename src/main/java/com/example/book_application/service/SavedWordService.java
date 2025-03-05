@@ -3,18 +3,18 @@ package com.example.book_application.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
 
-import com.example.book_application.model.SavedWord; 
-import com.example.book_application.repository.SavedWordRepository;
-import com.example.book_application.repository.UserRepository;
-import com.example.book_application.repository.WordRepository;
-import com.example.book_application.repository.BookRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.book_application.model.*;
+import com.example.book_application.repository.*;
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
+import com.example.book_application.dto.SavedWordRequest;
 import com.example.book_application.dto.SavedWordResponse;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;       
 
 @Service
 @Slf4j
@@ -22,22 +22,66 @@ import lombok.extern.slf4j.Slf4j;
 public class SavedWordService {
 
     private final SavedWordRepository savedWordRepository;
-    private final UserRepository userRepository;
-    private final WordRepository wordRepository;
+  
     private final BookRepository bookRepository;
+    private final ENRepository enRepository;
+    private final TRRepository trRepository;
+    private final TypeRepository typeRepository;
+    private final CategoryRepository categoryRepository;
 
-    // Save a saved word
-    public SavedWord saveSavedWord(SavedWord savedWord) {
+    @Transactional
+    public SavedWord saveSavedWord(SavedWordRequest request, User user) {
         try {
-            // İlişkili entity'lerin varlığını kontrol et
-            userRepository.findById(savedWord.getUser().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-            
-            wordRepository.findById(savedWord.getWord().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Word not found"));
-            
-            bookRepository.findById(savedWord.getBook().getId())
+            // Book kontrolü
+            Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+            // EN kelime kontrolü   
+            English english = enRepository.findByWord(request.getEnWord());
+            if (english == null) {
+                english = new English();
+                english.setWord(request.getEnWord());
+                english = enRepository.save(english);
+            }
+
+            // TR kelime kontrolü
+            Turkish turkish = trRepository.findByWord(request.getTrWord());
+            if (turkish == null) {
+                turkish = new Turkish();
+                turkish.setWord(request.getTrWord());
+                turkish = trRepository.save(turkish);
+            }
+
+            // Type kontrolü (opsiyonel)
+            Type type = null;
+            if (request.getType() != null) {
+                type = typeRepository.findByName(request.getType());
+                if (type == null) {
+                    type = new Type();
+                    type.setName(request.getType());
+                    type = typeRepository.save(type);
+                }
+            }
+
+            // Category kontrolü (opsiyonel)
+            Category category = null;
+            if (request.getCategory() != null) {
+                category = categoryRepository.findByName(request.getCategory());
+                if (category == null) {
+                    category = new Category();
+                    category.setName(request.getCategory());
+                    category = categoryRepository.save(category);
+                }
+            }
+
+            // SavedWord oluştur
+            SavedWord savedWord = new SavedWord();
+            savedWord.setUser(user);
+            savedWord.setBook(book);
+            savedWord.setEnglish(english);
+            savedWord.setTurkish(turkish);
+            savedWord.setType(type);
+            savedWord.setCategory(category);
 
             return savedWordRepository.save(savedWord);
         } catch (Exception e) {
@@ -46,7 +90,6 @@ public class SavedWordService {
         }
     }
 
-    // Find saved words by user ID
     public List<SavedWord> findByUserId(Long userId) {
         log.info("Finding saved words for user ID: {}", userId);
         List<SavedWord> savedWords = savedWordRepository.findByUserId(userId);
@@ -68,10 +111,40 @@ public class SavedWordService {
             .orElseThrow(() -> new ResourceNotFoundException("Saved word not found with id: " + id));
     }
 
-    public SavedWord updateSavedWord(Long id, SavedWord savedWordDetails) {
+    @Transactional
+    public SavedWord updateSavedWord(Long id, SavedWordRequest request) {
         SavedWord savedWord = findById(id);
-        savedWord.setWord(savedWordDetails.getWord());
-        savedWord.setBook(savedWordDetails.getBook());
+        
+        if (request.getTrWord() != null) {
+            Turkish tr = trRepository.findByWord(request.getTrWord());
+            if (tr == null) {
+                tr = new Turkish();
+                tr.setWord(request.getTrWord());
+                tr = trRepository.save(tr);
+            }
+            savedWord.setTurkish(tr);
+        }
+
+        if (request.getType() != null) {
+            Type type = typeRepository.findByName(request.getType());
+            if (type == null) {
+                type = new Type();
+                type.setName(request.getType());
+                type = typeRepository.save(type);
+            }
+            savedWord.setType(type);
+        }
+
+        if (request.getCategory() != null) {
+            Category category = categoryRepository.findByName(request.getCategory());
+            if (category == null) {
+                category = new Category();
+                category.setName(request.getCategory());
+                category = categoryRepository.save(category);
+            }
+            savedWord.setCategory(category);
+        }
+
         return savedWordRepository.save(savedWord);
     }
 
@@ -114,14 +187,17 @@ public class SavedWordService {
         dto.setBook(bookDTO);
         
         SavedWordResponse.WordDTO wordDTO = new SavedWordResponse.WordDTO();
-        wordDTO.setId(savedWord.getWord().getId());
-        wordDTO.setWord(savedWord.getWord().getWord());
-        wordDTO.setType(savedWord.getWord().getType());
-        wordDTO.setCategory(savedWord.getWord().getCategory());
-        wordDTO.setTr(savedWord.getWord().getTr());
+        wordDTO.setEnWord(savedWord.getEnglish().getWord());
+        wordDTO.setTrWord(savedWord.getTurkish().getWord());
+        if (savedWord.getType() != null) {
+            wordDTO.setType(savedWord.getType().getName());
+        }
+        if (savedWord.getCategory() != null) {
+            wordDTO.setCategory(savedWord.getCategory().getName());
+        }
         dto.setWord(wordDTO);
+        dto.setSavedDate(savedWord.getSavedDate());
         
         return dto;
     }
-
 }

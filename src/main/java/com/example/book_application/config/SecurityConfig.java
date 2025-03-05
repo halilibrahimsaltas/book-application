@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.example.book_application.service.UserService;
 import com.example.book_application.repository.UserRepository;
 import org.springframework.http.HttpMethod;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -35,8 +36,18 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/users/register", "/api/register").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/translates/**", "/translates/**", "/api/en/**", "/api/tr/**").permitAll()
+                .requestMatchers("/api/saved-words/**", "/saved-words/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/books").authenticated()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Unauthorized: " + authException.getMessage());
+                })
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         

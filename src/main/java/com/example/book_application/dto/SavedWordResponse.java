@@ -1,9 +1,11 @@
 package com.example.book_application.dto;
 
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SavedWordResponse {
     private Long id;
     private UserDTO user;
@@ -12,6 +14,8 @@ public class SavedWordResponse {
     private LocalDateTime savedDate;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserDTO {
         private Long id;
         private String username;
@@ -19,6 +23,8 @@ public class SavedWordResponse {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BookDTO {
         private Long id;
         private String title;
@@ -26,11 +32,12 @@ public class SavedWordResponse {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WordDTO {
-        private Long id;
-        private String word;
+        private String enWord;
+        private String trWord;
         private String type;
         private String category;
-        private String tr;
     }
 } 

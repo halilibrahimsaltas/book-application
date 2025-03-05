@@ -5,47 +5,43 @@ import './WordCard.css';
 const WordCard = ({ word, onClose, position, bookId }) => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState(null);
-    const [wordData, setWordData] = useState({
-        word: '',
-        type: '',
-        category: '',
-        tr: ''
-    });
+    const [translations, setTranslations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [wordExists, setWordExists] = useState(false);
 
+    const cleanWord = (word) => {
+        return word
+            .replace(/[—–]/g, '-') // Uzun tireleri normal tire ile değiştir
+            .replace(/[^\w\s-]/g, '') // Alfanumerik olmayan karakterleri kaldır
+            .trim(); // Başındaki ve sonundaki boşlukları temizle
+    };
+
     useEffect(() => {
-        fetchWordDetails();
+        fetchTranslations();
     }, [word]);
 
-    const fetchWordDetails = async () => {
+    const fetchTranslations = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get(`/api/words/search/${encodeURIComponent(word)}`);
-            if (response.data) {
-                setWordData({
-                    word: response.data.word || word,
-                    type: response.data.type || 'Tür bilgisi yok',
-                    category: response.data.category || 'Kategori bilgisi yok',
-                    tr: response.data.tr || 'Çeviri bulunamadı'
-                });
+            const cleanedWord = cleanWord(word);
+            const response = await api.get(`/api/translates/en/${encodeURIComponent(cleanedWord)}`);
+            if (response.data && response.data.length > 0) {
+                setTranslations(response.data);
                 setWordExists(true);
+            } else {
+                setTranslations([]);
+                setWordExists(false);
             }
         } catch (error) {
-            console.log('Kelime bulunamadı, varsayılan değerler kullanılıyor');
-            setWordData({
-                word: word,
-                type: 'Tür bilgisi yok',
-                category: 'Kategori bilgisi yok',
-                tr: 'Çeviri bulunamadı'
-            });
+            console.error('Kelime çevirisi alınırken hata:', error);
+            setTranslations([]);
             setWordExists(false);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleSaveWord = async () => {
+    const handleSaveWord = async (translation) => {
         if (!wordExists) {
             setSaveError('Bu kelime veritabanında bulunmadığı için kaydedilemez.');
             return;
@@ -56,7 +52,10 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             setSaveError(null);
             
             await api.post('/api/saved-words', {
-                wordId: wordData.id,
+                word: translation.enWord,
+                translation: translation.trWord,
+                type: translation.type,
+                category: translation.category,
                 bookId: bookId
             });
             
@@ -79,31 +78,32 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             }}
         >
             <button className="close-button" onClick={onClose}>×</button>
-            <h3>{wordData.word}</h3>
+            <h3>{word}</h3>
             <div className="word-details">
                 {isLoading ? (
                     <p>Yükleniyor...</p>
+                ) : translations.length > 0 ? (
+                    <div className="translations-list">
+                        {translations.map((translation, index) => (
+                            <div key={index} className="translation-item">
+                                <p><strong>Türkçe:</strong> {translation.trWord}</p>
+                                <p><strong>Tür:</strong> {translation.type}</p>
+                                <p><strong>Kategori:</strong> {translation.category}</p>
+                                <button 
+                                    className="save-button" 
+                                    onClick={() => handleSaveWord(translation)}
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? 'Kaydediliyor...' : 'Bu Anlamı Kaydet'}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 ) : (
-                    <>
-                        <p><strong>Türkçe:</strong> {wordData.tr}</p>
-                        <p><strong>Tür:</strong> {wordData.type}</p>
-                        <p><strong>Kategori:</strong> {wordData.category}</p>
-                    </>
+                    <p className="no-translation">Bu kelime için çeviri bulunamadı.</p>
                 )}
             </div>
-            <div className="word-card-actions">
-                <button 
-                    className="save-button" 
-                    onClick={handleSaveWord}
-                    disabled={isSaving || !wordExists}
-                >
-                    {isSaving ? 'Kaydediliyor...' : (wordExists ? 'Kelimeyi Kaydet' : 'Kelime Bulunamadı')}
-                </button>
-                {saveError && <p className="error-message">{saveError}</p>}
-                {!wordExists && !saveError && (
-                    <p className="info-message">Bu kelime veritabanında bulunmamaktadır.</p>
-                )}
-            </div>
+            {saveError && <p className="error-message">{saveError}</p>}
         </div>
     );
 };

@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.PrePersist;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.example.book_application.dto.UserDTO;
 
 @Entity
@@ -30,16 +29,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(nullable = false, length = 255)
+    private String password;
+
+    @Column(length = 20)
+    private String role = "USER";
+
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -47,10 +49,9 @@ public class User {
     @JsonIgnore
     private List<SavedWord> savedWords = new ArrayList<>();
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<BookProgress> bookProgresses = new ArrayList<>();
 
     // DTO dönüşümü için yardımcı metod
     public UserDTO toDTO() {

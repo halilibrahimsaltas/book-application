@@ -1,14 +1,22 @@
 .word-card {
+    position: fixed;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    min-width: 200px;
-    max-width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    min-width: 250px;
+    max-width: 350px;
     z-index: 1000;
 }
 
-.word-card .close-button {
+.word-card h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 1.4em;
+    padding-right: 30px;
+}
+
+.close-button {
     position: absolute;
     right: 10px;
     top: 10px;
@@ -17,54 +25,60 @@
     font-size: 20px;
     cursor: pointer;
     color: #666;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
-.word-card .close-button:hover {
+.close-button:hover {
+    background: #f0f0f0;
     color: #333;
-}
-
-.word-card h3 {
-    margin: 0 0 15px 0;
-    color: #333;
-    font-size: 18px;
 }
 
 .word-details {
-    font-size: 14px;
+    margin-top: 10px;
 }
 
-.word-details p {
-    margin: 8px 0;
-    color: #666;
-    min-height: 20px;
+.translations-list {
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.word-details p:only-child {
-    text-align: center;
-    font-style: italic;
-    color: #999;
+.translation-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
 }
 
-.word-details strong {
-    color: #333;
-    margin-right: 5px;
+.translation-item:last-child {
+    margin-bottom: 0;
 }
 
-.word-card-actions {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
+.translation-item p {
+    margin: 5px 0;
+    color: #444;
+}
+
+.translation-item strong {
+    color: #2c3e50;
 }
 
 .save-button {
-    width: 100%;
-    padding: 8px 12px;
     background-color: #4CAF50;
     color: white;
     border: none;
+    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    margin-top: 8px;
+    width: 100%;
     transition: background-color 0.2s;
 }
 
@@ -78,16 +92,22 @@
 }
 
 .error-message {
-    color: #f44336;
-    font-size: 12px;
-    margin-top: 8px;
+    color: #dc3545;
+    margin-top: 10px;
+    font-size: 14px;
     text-align: center;
 }
 
-.info-message {
-    color: #2196F3;
-    font-size: 12px;
-    margin-top: 8px;
+.no-translation {
+    color: #666;
     text-align: center;
+    padding: 20px;
     font-style: italic;
+}
+
+/* Loading spinner */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
 } 
