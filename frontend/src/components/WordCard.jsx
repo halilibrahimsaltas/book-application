@@ -193,6 +193,12 @@ const WordCard = ({ word, onClose, position, bookId }) => {
         }, 2700);
     };
 
+    const capitalizeFirstLetter = (str) => {
+        return str.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    };
+
     if (!word) return null;
 
     return (
@@ -200,21 +206,19 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             className={`word-card ${showCard ? 'show' : ''}`}
             style={{
                 position: 'fixed',
-                left: Math.min(Math.max(position.x, 10), window.innerWidth - 260),
-                top: Math.min(Math.max(position.y, 10), window.innerHeight - 350),
+                left: Math.min(Math.max(position.x, 10), window.innerWidth - 220),
+                top: Math.min(Math.max(position.y, 10), window.innerHeight - 300),
                 zIndex: 1000
             }}
         >
             <button className="close-button" onClick={onClose}>×</button>
             <div className="word-header">
                 <h3>{cleanWord(word)}</h3>
-                <span className="search-info">Çeviriler</span>
             </div>
             <div className="word-details">
                 {isLoading ? (
                     <div className="loading-spinner">
                         <div className="spinner"></div>
-                        <p>Çeviri yükleniyor...</p>
                     </div>
                 ) : translations.length > 0 ? (
                     <div className={`translations-list ${translations.length > 3 ? 'has-more' : ''}`}>
@@ -229,17 +233,16 @@ const WordCard = ({ word, onClose, position, bookId }) => {
                                     {isSaving ? '•' : '+'}
                                 </button>
                                 <div className="translation-header">
-                                    <span className="word-type">{translation.type || 'Belirtilmemiş'}</span>
+                                    <span className="word-type">{translation.type || 'Genel'}</span>
                                     <span className="category-tag">{translation.category || 'Genel'}</span>
                                 </div>
-                                <p className="turkish-translation">{translation.trWord}</p>
+                                <p className="turkish-translation">{capitalizeFirstLetter(translation.trWord)}</p>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div className="no-translation">
-                        <p>Bu kelime için çeviri bulunamadı.</p>
-                        <small>Yeni çeviri eklemek için yönetici ile iletişime geçin.</small>
+                        <p>Çeviri bulunamadı</p>
                     </div>
                 )}
             </div>

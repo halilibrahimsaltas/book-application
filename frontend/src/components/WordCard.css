@@ -1,18 +1,18 @@
 .word-card {
     position: absolute;
     background: white;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
-    min-width: 240px;
-    max-width: 260px;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    max-width: 240px;
     z-index: 1000;
     opacity: 0;
     transform: translateY(-10px);
     transition: all 0.3s ease;
     border: 1px solid rgba(226, 232, 240, 0.8);
     backdrop-filter: blur(10px);
-    max-height: calc(100vh - 300px);
+    max-height: 350px;
     overflow-y: auto;
 }
 
@@ -22,40 +22,40 @@
 }
 
 .word-header {
-    margin: 0 0 15px 0;
-    padding-right: 30px;
-    border-bottom: 2px solid #E2E8F0;
-    padding-bottom: 10px;
+    margin: 0 0 8px 0;
+    padding-right: 24px;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 8px;
 }
 
 .word-header h3 {
     margin: 0;
     color: #2C5282;
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: 600;
-    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    font-family: 'Source Sans Pro', 'Segoe UI', sans-serif;
     text-transform: capitalize;
 }
 
 .search-info {
-    font-size: 0.8em;
+    font-size: 0.75em;
     color: #718096;
     display: block;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .close-button {
     position: absolute;
-    right: 12px;
-    top: 12px;
+    right: 8px;
+    top: 8px;
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
     color: #718096;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -70,14 +70,14 @@
 }
 
 .word-details {
-    margin-top: 15px;
+    margin-top: 8px;
 }
 
 .translations-list {
-    max-height: 320px; /* Yaklaşık 3 kelime yüksekliği */
+    max-height: 250px;
     overflow-y: auto;
-    padding-right: 8px;
-    margin: 10px -8px;
+    padding-right: 6px;
+    margin: 8px -6px;
     scrollbar-width: thin;
     scrollbar-color: #CBD5E0 #F7FAFC;
 }
@@ -102,16 +102,14 @@
 }
 
 .translation-item {
-    padding: 12px;
+    padding: 8px 10px;
     border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
     background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     position: relative;
-    transition: all 0.2s ease;
-    height: auto;
-    min-height: 70px;
+    min-height: 55px;
 }
 
 .translation-item:last-child {
@@ -134,22 +132,24 @@
 .translation-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    padding-right: 40px;
-    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+    padding-right: 32px;
+    flex-wrap: nowrap;
 }
 
 .word-type, .category-tag {
-    background-color: #EDF2F7;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75em;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 0.65em;
     color: #4A5568;
     display: inline-block;
     border: 1px solid #E2E8F0;
     font-weight: 500;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
 }
 
 .word-type {
@@ -176,13 +176,13 @@
 }
 
 .turkish-translation {
-    font-size: 1.4em;
+    font-size: 1.25em;
     font-weight: 500;
-    margin: 8px 0;
+    margin: 4px 0;
     color: #2D3748;
     font-family: 'Source Sans Pro', 'Segoe UI', sans-serif;
-    letter-spacing: 0.3px;
     text-transform: capitalize;
+    letter-spacing: 0.2px;
 }
 
 .label {
@@ -193,27 +193,25 @@
 
 .save-button {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     background-color: #4299E1;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 1.2em;
+    font-size: 1em;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.9;
 }
 
 .save-button:hover {
     background-color: #3182CE;
-    opacity: 1;
     transform: scale(1.05);
 }
 
@@ -239,13 +237,13 @@
     background: #fff5f5;
     border: 1px solid #fed7d7;
     color: #c53030;
-    margin-top: 12px;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .error-icon {
@@ -271,17 +269,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px;
+    padding: 16px;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #4299e1;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #4299e1;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .save-notification {
