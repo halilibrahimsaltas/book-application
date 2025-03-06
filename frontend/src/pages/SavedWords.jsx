@@ -43,6 +43,67 @@ const SavedWords = () => {
     navigate(`/books/${bookId}/read`);
   };
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  const formatDate = (dateString) => {
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString('tr-TR', options);
+  };
+
+  const renderTableContent = () => {
+    if (savedWords.length === 0) {
+      return (
+        <tr>
+          <td colSpan="5" className="no-words-message">
+            <p>Henüz kaydedilmiş kelime bulunmuyor.</p>
+          </td>
+        </tr>
+      );
+    }
+
+    return savedWords.map((word) => (
+      <tr key={word.id}>
+        <td className="word-cell english" title={word.englishWord}>
+          {capitalizeFirstLetter(word.englishWord)}
+        </td>
+        <td className="word-cell turkish" title={word.turkishWord}>
+          {capitalizeFirstLetter(word.turkishWord)}
+        </td>
+        <td className="book-cell" title={word.bookTitle}>
+          <button 
+            className="book-link"
+            onClick={() => handleBookClick(word.bookId)}
+          >
+            {word.bookTitle || 'Kitaba Git'}
+          </button>
+        </td>
+        <td className="date-cell" title={formatDate(word.createdAt)}>
+          {formatDate(word.createdAt)}
+        </td>
+        <td className="actions-cell">
+          <button 
+            className="delete-button"
+            onClick={() => handleDelete(word.id)}
+            title="Kelimeyi Sil"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+        </td>
+      </tr>
+    ));
+  };
+
   if (loading) {
     return (
       <div className="saved-words-container">
@@ -83,43 +144,10 @@ const SavedWords = () => {
             </tr>
           </thead>
           <tbody>
-            {savedWords.map((word) => (
-              <tr key={word.id}>
-                <td className="word-cell english">{word.englishWord}</td>
-                <td className="word-cell turkish">{word.turkishWord}</td>
-                <td className="book-cell">
-                  <button 
-                    className="book-link"
-                    onClick={() => handleBookClick(word.bookId)}
-                  >
-                    {word.bookTitle || 'Kitaba Git'}
-                  </button>
-                </td>
-                <td className="date-cell">
-                  {new Date(word.createdAt).toLocaleDateString('tr-TR')}
-                </td>
-                <td className="actions-cell">
-                  <button 
-                    className="delete-button"
-                    onClick={() => handleDelete(word.id)}
-                    title="Kelimeyi Sil"
-                  >
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {renderTableContent()}
           </tbody>
         </table>
       </div>
-
-      {savedWords.length === 0 && (
-        <div className="no-words-message">
-          <p>Henüz kaydedilmiş kelime bulunmuyor.</p>
-        </div>
-      )}
     </div>
   );
 };
