@@ -1,12 +1,19 @@
+/* Google Fonts import */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Sans+Pro:wght@400;600&display=swap');
+
 /* Sabit genişlik değişkeni */
 :root {
     --reader-width: 800px;
     --reader-padding: 2rem;
+    --text-color: #2c3e50;
+    --bg-color: #f8f9fa;
+    --line-height: 1.8;
+    --paragraph-spacing: 1.8rem;
 }
 
 /* Body stili - BookReader sayfası için */
 body.book-reader-page {
-    background-color: #f8f9fa;
+    background-color: var(--bg-color);
     padding-top: 0; /* Padding'i kaldırdım */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -15,6 +22,9 @@ body.book-reader-page {
     overflow-x: hidden;
     perspective: 1000;
     -webkit-perspective: 1000;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 body.book-reader-page .navbar {
@@ -43,150 +53,224 @@ body.book-reader-page .navbar .nav-container {
 
 /* Ana konteyner */
 .book-reader-container {
-    width: var(--reader-width);
-    margin: 0 auto;
-    padding: 0;
-    background-color: #fff;
-    min-height: calc(100vh - 48px);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    height: 100vh;
+    background-color: var(--bg-color);
     position: relative;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
 }
 
-/* Başlık */
+.book-reader-container.no-navbar {
+    padding-top: 0;
+    height: 100vh;
+}
+
 .book-reader-header {
-    width: 100%;
-    margin: 0;
-    text-align: left;
-    padding: 0.5rem var(--reader-padding);
-    background-color: #fff;
-    border-bottom: 1px solid #eee;
-    z-index: 100;
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 40px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
-.book-reader-header .header-content {
-    padding-left: 0.5rem;
+.header-content {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
-.book-reader-header h1 {
-    font-size: 1.2rem;
-    color: #2c3e50;
+.header-content h1 {
     margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    font-weight: 600;
 }
 
-.author {
-    color: #7f8c8d;
-    font-style: italic;
-    margin-top: 0.15rem;
-    font-size: 0.85rem;
+.header-content .author {
+    margin: 0.25rem 0 0;
+    color: #666;
+    font-size: 0.9rem;
 }
 
-/* Geri butonu */
 .back-button {
     padding: 0.5rem 1rem;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #666;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    margin-left: 1rem;
+    transition: all 0.2s ease;
 }
 
 .back-button:hover {
-    background-color: #2980b9;
+    background-color: #f0f0f0;
+    color: #333;
 }
 
-/* İçerik */
 .book-content {
-    width: 100%;
-    height: calc(100vh - 140px);
-    padding: 0 var(--reader-padding);
-    background-color: #fff;
-    box-shadow: none;
+    flex: 1;
+    padding: 2rem;
     overflow-y: auto;
-    font-size: 1.2rem;
-    color: #34495e;
-    text-align: justify;
-    font-family: 'Georgia', serif;
-    line-height: 1.5;
-    margin: 0;
-    position: relative;
-}
-
-/* Paragraflar */
-.book-content p {
-    margin-bottom: 1.4rem;
-    text-indent: 0;
-    padding-left: 0;
-}
-
-/* Paragrafın son satırı için özel stil */
-.book-content p:last-child {
-    margin-bottom: 0;
-}
-
-/* Sayfalama */
-.page-controls {
+    line-height: var(--line-height);
+    font-size: 1.125rem; /* 18px */
+    color: var(--text-color);
+    max-width: var(--reader-width);
+    margin: 0 auto;
     width: 100%;
+    font-family: 'Merriweather', Georgia, serif;
+    letter-spacing: 0.01em;
+    word-spacing: 0.05em;
+}
+
+.book-content p {
+    margin-bottom: var(--paragraph-spacing);
+    text-align: justify;
+    hyphens: auto;
+}
+
+/* Özel scrollbar stili */
+.book-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.book-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.book-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.book-content::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.clickable-word {
+    cursor: pointer;
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-word:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.page-controls {
+    background-color: white;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1.5rem;
-    margin: 0;
-    padding: 0.75rem var(--reader-padding);
-    background-color: #f8f9fa;
+    gap: 1rem;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
     bottom: 0;
-    border-top: 1px solid #eee;
 }
 
 .page-controls button {
-    padding: 0.8rem 1.5rem;
-    background-color: #3498db;
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    min-width: 120px;
+    transition: all 0.2s ease;
 }
 
 .page-controls button:hover:not(:disabled) {
-    background-color: #2980b9;
-    transform: scale(1.05);
+    background-color: #2563eb;
 }
 
 .page-controls button:disabled {
-    background-color: #bdc3c7;
+    background-color: #cbd5e1;
     cursor: not-allowed;
-    opacity: 0.7;
 }
 
 .page-controls span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.book-reader-loading,
+.book-reader-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     font-size: 1.1rem;
-    color: #2c3e50;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    background-color: white;
-    border-radius: 5px;
+    color: #666;
+}
+
+.book-reader-error {
+    color: #ef4444;
+}
+
+/* Karanlık mod desteği */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #e1e7ef;
+        --bg-color: #1a1a1a;
+    }
+
+    .book-reader-container,
+    .book-content {
+        background-color: var(--bg-color);
+    }
+
+    .book-reader-header {
+        background-color: #242424;
+    }
+
+    .book-content::-webkit-scrollbar-track {
+        background: #2d2d2d;
+    }
+
+    .book-content::-webkit-scrollbar-thumb {
+        background: #666;
+    }
+
+    .book-content::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    :root {
+        --reader-width: 100%;
+        --reader-padding: 1rem;
+        --paragraph-spacing: 1.5rem;
+    }
+
+    .book-reader-header {
+        padding: 1rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.2rem;
+    }
+
+    .book-content {
+        padding: 1rem;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .page-controls {
+        padding: 0.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .page-controls button {
+        width: 100%;
+    }
 }
 
 /* Responsive */
@@ -224,17 +308,19 @@ body.book-reader-page .navbar .nav-container {
     }
 }
 
-.clickable-word {
-    cursor: pointer;
-    display: inline-block;
-    padding: 0 2px;
-    border-radius: 3px;
-    transition: background-color 0.2s;
+/* Tablet ve orta boy ekranlar için optimizasyon */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .book-content {
+        max-width: 90%;
+        padding: 1.5rem;
+    }
 }
 
-.clickable-word:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #2196f3;
+/* Büyük ekranlar için maksimum genişlik */
+@media (min-width: 1600px) {
+    .book-content {
+        max-width: 900px;
+    }
 }
 
 /* Navbar gizleme animasyonu için olan eski stiller kaldırılacak */

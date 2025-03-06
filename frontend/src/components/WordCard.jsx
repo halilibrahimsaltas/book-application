@@ -11,13 +11,46 @@ const WordCard = ({ word, onClose, position, bookId }) => {
     const [showCard, setShowCard] = useState(false);
 
     const cleanWord = useCallback((word) => {
+        if (!word) return '';
+
         return word
-            ?.replace(/[—–]/g, '-')
-            ?.replace(/[.,!?;:'"()\[\]{}]/g, '')
-            ?.replace(/\s+/g, ' ')
-            ?.trim()
-            ?.toLowerCase() || '';
+            // Özel tire işaretlerini standart tire ile değiştir
+            .replace(/[—–]/g, '-')
+            // Apostrof işaretlerini standartlaştır
+            .replace(/['′']/g, "'")
+            // Noktalama işaretlerini ve özel karakterleri kaldır
+            .replace(/[.,!?;:"()\[\]{}]/g, '')
+            // Birleşik kelimeleri ayır (örn: didn't -> didn t)
+            .replace(/([a-z])'([a-z])/gi, '$1 $2')
+            // Tire ile birleştirilmiş kelimeleri ayır
+            .replace(/([a-z])-([a-z])/gi, '$1 $2')
+            // Fazla boşlukları temizle
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
     }, []);
+
+    const handleWordClick = async (word) => {
+        // Eğer kelime birleşik ise (örn: "didn't", "she's") her bir parçayı ayrı ayrı ara
+        const parts = word.split(/[-'\s]+/);
+        const cleanedParts = parts.map(part => cleanWord(part)).filter(Boolean);
+        
+        // Her bir parça için ayrı ayrı çeviri al
+        const allTranslations = [];
+        for (const part of cleanedParts) {
+            try {
+                const response = await api.get(`/api/translates/en/${encodeURIComponent(part)}`);
+                if (response.data && Array.isArray(response.data)) {
+                    allTranslations.push(...response.data);
+                }
+            } catch (error) {
+                console.error(`Çeviri alınamadı: ${part}`, error);
+            }
+        }
+        
+        setTranslations(allTranslations);
+        setWordExists(allTranslations.length > 0);
+    };
 
     const fetchTranslations = useCallback(async () => {
         try {
@@ -29,11 +62,32 @@ const WordCard = ({ word, onClose, position, bookId }) => {
                 throw new Error('Geçerli bir kelime girilmedi');
             }
 
-            const response = await api.get(`/api/translates/en/${encodeURIComponent(cleanedWord)}`);
-            const translationResults = response.data && Array.isArray(response.data) ? response.data : [];
-            
-            setTranslations(translationResults);
-            setWordExists(translationResults.length > 0);
+            // Kelimeyi parçalara ayır ve her parça için çeviri al
+            const parts = cleanedWord.split(/[-'\s]+/);
+            const uniqueParts = [...new Set(parts)].filter(Boolean);
+
+            if (uniqueParts.length > 1) {
+                // Birden fazla kelime varsa (örn: "didn't" -> "did" "not")
+                const allTranslations = [];
+                for (const part of uniqueParts) {
+                    try {
+                        const response = await api.get(`/api/translates/en/${encodeURIComponent(part)}`);
+                        if (response.data && Array.isArray(response.data)) {
+                            allTranslations.push(...response.data);
+                        }
+                    } catch (error) {
+                        console.error(`Çeviri alınamadı: ${part}`, error);
+                    }
+                }
+                setTranslations(allTranslations);
+                setWordExists(allTranslations.length > 0);
+            } else {
+                // Tek kelime için normal çeviri
+                const response = await api.get(`/api/translates/en/${encodeURIComponent(cleanedWord)}`);
+                const translationResults = response.data && Array.isArray(response.data) ? response.data : [];
+                setTranslations(translationResults);
+                setWordExists(translationResults.length > 0);
+            }
 
         } catch (error) {
             console.error('Kelime çevirisi alınırken hata:', error);
