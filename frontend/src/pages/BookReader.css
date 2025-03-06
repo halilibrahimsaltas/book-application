@@ -7,7 +7,7 @@
 /* Body stili - BookReader sayfası için */
 body.book-reader-page {
     background-color: #f8f9fa;
-    padding-top: 48px;
+    padding-top: 0; /* Padding'i kaldırdım */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
@@ -19,7 +19,7 @@ body.book-reader-page {
 
 body.book-reader-page .navbar {
     background-color: #fff;
-    border-bottom: 1px solid #eee;
+    border-bottom: none; /* Border'ı kaldırdım */
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -27,6 +27,11 @@ body.book-reader-page .navbar {
     -webkit-transform-style: preserve-3d;
     will-change: transform;
     height: 48px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 body.book-reader-page .navbar .nav-container {
@@ -112,7 +117,7 @@ body.book-reader-page .navbar .nav-container {
 .book-content {
     width: 100%;
     height: calc(100vh - 140px);
-    padding: 0.5rem var(--reader-padding);
+    padding: 0 var(--reader-padding);
     background-color: #fff;
     box-shadow: none;
     overflow-y: auto;
@@ -122,6 +127,7 @@ body.book-reader-page .navbar .nav-container {
     font-family: 'Georgia', serif;
     line-height: 1.5;
     margin: 0;
+    position: relative;
 }
 
 /* Paragraflar */

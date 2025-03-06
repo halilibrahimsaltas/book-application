@@ -111,25 +111,32 @@ const BookReader = () => {
 
     const handleWordClick = (event, word) => {
         const rect = event.target.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+        const contentContainer = document.querySelector('.book-content');
+        const contentRect = contentContainer.getBoundingClientRect();
         
-        // Kartın genişliği ve yüksekliği (tahmini değerler)
-        const cardWidth = 320;
-        const cardHeight = 400;
+        // Kartın genişliği ve yüksekliği
+        const cardWidth = 260;
+        const cardHeight = Math.min(400, window.innerHeight - 300);
         
-        let x = rect.left;
-        let y = rect.bottom + window.scrollY;
+        let x = rect.left - contentRect.left;
+        let y = rect.top - contentRect.top + contentContainer.scrollTop;
         
         // Sağ tarafa taşma kontrolü
-        if (x + cardWidth > viewportWidth) {
-            x = viewportWidth - cardWidth - 20;
+        if (x + cardWidth > contentRect.width) {
+            x = contentRect.width - cardWidth - 20;
         }
         
-        // Alt tarafa taşma kontrolü
-        if (y + cardHeight > viewportHeight + window.scrollY) {
-            y = rect.top + window.scrollY - cardHeight - 10;
+        // Alt tarafa taşma kontrolü - sayfanın ortasından sonra yukarı doğru açılsın
+        const middleOfPage = contentRect.height / 2;
+        if (y > middleOfPage) {
+            y = y - cardHeight - 30; // Kelimenin üstünde göster
+        } else {
+            y = y + 30; // Kelimenin altında göster
         }
+        
+        // Minimum ve maximum y değerlerini kontrol et
+        const maxY = contentRect.height - cardHeight - 20;
+        y = Math.max(20, Math.min(y, maxY));
         
         setWordCardPosition({ x, y });
         setSelectedWord(word);

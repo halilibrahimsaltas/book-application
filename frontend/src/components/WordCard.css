@@ -1,5 +1,5 @@
 .word-card {
-    position: fixed;
+    position: absolute;
     background: white;
     border-radius: 16px;
     padding: 15px;
@@ -12,6 +12,8 @@
     transition: all 0.3s ease;
     border: 1px solid rgba(226, 232, 240, 0.8);
     backdrop-filter: blur(10px);
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
 }
 
 .word-card.show {
@@ -284,24 +286,40 @@
 
 .save-notification {
     position: fixed;
-    bottom: 24px;
+    top: 24px;
     right: 24px;
     padding: 16px 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.3s ease;
-    z-index: 1100;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: slideInRight 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.save-notification::before {
+    content: '✓';
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .save-notification.success {
-    background: #48bb78;
+    background: #10B981;
     color: white;
 }
 
 .save-notification.error {
-    background: #f56565;
+    background: #EF4444;
     color: white;
+}
+
+.save-notification.error::before {
+    content: '⚠️';
 }
 
 .save-notification.fade-out {
@@ -309,7 +327,7 @@
     transform: translateX(100%);
 }
 
-@keyframes slideIn {
+@keyframes slideInRight {
     from {
         transform: translateX(100%);
         opacity: 0;
