@@ -13,6 +13,7 @@ const Router = () => (
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/books/:id/read" element={<BookReader />} />
+      <Route path="/books/:id/words" element={<BookReader />} />
     </Routes>
   </BrowserRouter>
 );

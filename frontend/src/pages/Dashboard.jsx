@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await api.get("/books");
+      const response = await api.get("/api/books");
       setBooks(response.data);
       setLoading(false);
     } catch (error) {
@@ -46,7 +46,7 @@ const Dashboard = () => {
     }));
 
     try {
-      await api.post('/books', formData, {
+      await api.post('/api/books', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -58,14 +58,6 @@ const Dashboard = () => {
     } catch (error) {
       setError('Kitap kaydedilirken bir hata oluştu.');
       console.error("Error saving book:", error);
-    }
-  };
-
-  const handleSaveWord = async (bookId) => {
-    try {
-      navigate(`/books/${bookId}/words`);
-    } catch (error) {
-      console.error("Error navigating to word save page:", error);
     }
   };
 
@@ -124,7 +116,7 @@ const Dashboard = () => {
           <BookCard
             key={book.id}
             book={book}
-            onSaveWord={handleSaveWord}
+            onSaveWord={() => {}}
           />
         ))}
       </div>

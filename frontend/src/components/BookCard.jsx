@@ -16,7 +16,7 @@ const WordIcon = () => (
   </svg>
 );
 
-const BookCard = ({ book, onViewSavedWords }) => {
+const BookCard = ({ book, onSaveWord }) => {
   const navigate = useNavigate();
 
   // Tarih formatlamak için yardımcı fonksiyon
@@ -33,6 +33,11 @@ const BookCard = ({ book, onViewSavedWords }) => {
     navigate(`/books/${book.id}/read`);
   };
 
+  const handleSavedWordsClick = (e) => {
+    e.stopPropagation();
+    navigate(`/books/${book.id}/words`);
+  };
+
   return (
     <div className="book-card" onClick={handleCardClick}>
       <div className="book-card-header">
@@ -46,10 +51,7 @@ const BookCard = ({ book, onViewSavedWords }) => {
       <div className="book-card-footer">
         <button 
           className="book-card-button primary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewSavedWords(book.id);
-          }}
+          onClick={handleSavedWordsClick}
         >
           <WordIcon />
           Kaydedilen Kelimeler
@@ -68,7 +70,7 @@ BookCard.propTypes = {
     filePath: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired
   }).isRequired,
-  onViewSavedWords: PropTypes.func.isRequired
+  onSaveWord: PropTypes.func.isRequired
 };
 
 export default BookCard;

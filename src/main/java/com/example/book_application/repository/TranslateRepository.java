@@ -16,13 +16,33 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
     List<Translate> findByTurkish(Turkish turkish);
     boolean existsByEnglishAndTurkish(English english, Turkish turkish);
 
-    @Query(value = "SELECT new com.example.book_application.dto.TranslateResponse(" +
-            "t.id, e.word, tr.word, COALESCE(ty.name, ''), COALESCE(c.name, '')) " +
-            "FROM Translate t " +
-            "INNER JOIN t.english e " +
-            "INNER JOIN t.turkish tr " +
-            "LEFT JOIN t.type ty " +
-            "LEFT JOIN t.category c " +
-            "WHERE LOWER(e.word) = LOWER(:word)")
+    @Query("SELECT new com.example.book_application.dto.TranslateResponse(" +
+           "t.id, " +
+           "e.word, " +
+           "tr.word, " +
+           "COALESCE(ty.name, ''), " +
+           "COALESCE(c.name, '')) " +
+           "FROM Translate t " +
+           "JOIN t.english e " +
+           "JOIN t.turkish tr " +
+           "LEFT JOIN t.type ty " +
+           "LEFT JOIN t.category c " +
+           "WHERE e.word = :word " +
+           "ORDER BY t.id")
     List<TranslateResponse> findTranslationsByWord(@Param("word") String word);
+
+    @Query("SELECT new com.example.book_application.dto.TranslateResponse(" +
+           "t.id, " +
+           "e.word, " +
+           "tr.word, " +
+           "COALESCE(ty.name, ''), " +
+           "COALESCE(c.name, '')) " +
+           "FROM Translate t " +
+           "JOIN t.english e " +
+           "JOIN t.turkish tr " +
+           "LEFT JOIN t.type ty " +
+           "LEFT JOIN t.category c " +
+           "WHERE LOWER(tr.word) LIKE LOWER(CONCAT('%', :word, '%')) " +
+           "ORDER BY t.id")
+    List<TranslateResponse> findTranslationsByTurkishWord(@Param("word") String word);
 } 

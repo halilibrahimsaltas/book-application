@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import './WordCard.css';
 
@@ -8,38 +8,59 @@ const WordCard = ({ word, onClose, position, bookId }) => {
     const [translations, setTranslations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [wordExists, setWordExists] = useState(false);
+    const [showCard, setShowCard] = useState(false);
 
-    const cleanWord = (word) => {
+    const cleanWord = useCallback((word) => {
         return word
-            .replace(/[—–]/g, '-') // Uzun tireleri normal tire ile değiştir
-            .replace(/[^\w\s-]/g, '') // Alfanumerik olmayan karakterleri kaldır
-            .trim(); // Başındaki ve sonundaki boşlukları temizle
-    };
+            ?.replace(/[—–]/g, '-')
+            ?.replace(/[.,!?;:'"()\[\]{}]/g, '')
+            ?.replace(/\s+/g, ' ')
+            ?.trim()
+            ?.toLowerCase() || '';
+    }, []);
 
-    useEffect(() => {
-        fetchTranslations();
-    }, [word]);
-
-    const fetchTranslations = async () => {
+    const fetchTranslations = useCallback(async () => {
         try {
             setIsLoading(true);
+            setSaveError(null);
             const cleanedWord = cleanWord(word);
-            const response = await api.get(`/api/translates/en/${encodeURIComponent(cleanedWord)}`);
-            if (response.data && response.data.length > 0) {
-                setTranslations(response.data);
-                setWordExists(true);
-            } else {
-                setTranslations([]);
-                setWordExists(false);
+            
+            if (!cleanedWord) {
+                throw new Error('Geçerli bir kelime girilmedi');
             }
+
+            const response = await api.get(`/api/translates/en/${encodeURIComponent(cleanedWord)}`);
+            const translationResults = response.data && Array.isArray(response.data) ? response.data : [];
+            
+            setTranslations(translationResults);
+            setWordExists(translationResults.length > 0);
+
         } catch (error) {
             console.error('Kelime çevirisi alınırken hata:', error);
             setTranslations([]);
             setWordExists(false);
+            setSaveError(
+                error.response?.data?.message || 
+                error.message || 
+                'Kelime çevirisi alınamadı'
+            );
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [word, cleanWord]);
+
+    useEffect(() => {
+        setShowCard(true);
+        if (word) {
+            fetchTranslations();
+        }
+        
+        return () => {
+            setShowCard(false);
+            setTranslations([]);
+            setSaveError(null);
+        };
+    }, [word, fetchTranslations]);
 
     const handleSaveWord = async (translation) => {
         if (!wordExists) {
@@ -51,26 +72,49 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             setIsSaving(true);
             setSaveError(null);
             
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Kelime kaydetmek için giriş yapmalısınız');
+            }
+            
             await api.post('/api/saved-words', {
-                word: translation.enWord,
-                translation: translation.trWord,
-                type: translation.type,
-                category: translation.category,
+                englishWord: translation.english,
+                turkishWord: translation.turkish,
+                type: translation.type || 'Belirtilmemiş',
+                category: translation.category || 'Genel',
                 bookId: bookId
             });
             
-            alert('Kelime başarıyla kaydedildi!');
+            showNotification('Kelime başarıyla kaydedildi!', 'success');
         } catch (error) {
             console.error('Kelime kaydedilirken hata oluştu:', error);
-            setSaveError('Kelime kaydedilirken bir hata oluştu.');
+            const errorMessage = error.response?.data?.message || 
+                               error.message || 
+                               'Kelime kaydedilirken bir hata oluştu.';
+            setSaveError(errorMessage);
+            showNotification(errorMessage, 'error');
         } finally {
             setIsSaving(false);
         }
     };
 
+    const showNotification = (message, type = 'success') => {
+        const notification = document.createElement('div');
+        notification.className = `save-notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 2700);
+    };
+
+    if (!word) return null;
+
     return (
         <div 
-            className="word-card"
+            className={`word-card ${showCard ? 'show' : ''}`}
             style={{
                 position: 'absolute',
                 left: `${position.x}px`,
@@ -81,29 +125,47 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             <h3>{word}</h3>
             <div className="word-details">
                 {isLoading ? (
-                    <p>Yükleniyor...</p>
+                    <div className="loading-spinner">
+                        <div className="spinner"></div>
+                        <p>Çeviri yükleniyor...</p>
+                    </div>
                 ) : translations.length > 0 ? (
                     <div className="translations-list">
                         {translations.map((translation, index) => (
-                            <div key={index} className="translation-item">
-                                <p><strong>Türkçe:</strong> {translation.trWord}</p>
-                                <p><strong>Tür:</strong> {translation.type}</p>
-                                <p><strong>Kategori:</strong> {translation.category}</p>
+                            <div key={translation.id || index} className="translation-item">
+                                <div className="translation-header">
+                                    <span className="word-type">{translation.type || 'Belirtilmemiş'}</span>
+                                </div>
+                                <p className="english-word">{translation.english}</p>
+                                <p className="turkish-translation">Anlam: {translation.turkish}</p>
+                                <p className="category-tag">Kategori: {translation.category || 'Genel'}</p>
                                 <button 
-                                    className="save-button" 
+                                    className={`save-button ${isSaving ? 'saving' : ''}`}
                                     onClick={() => handleSaveWord(translation)}
                                     disabled={isSaving}
                                 >
-                                    {isSaving ? 'Kaydediliyor...' : 'Bu Anlamı Kaydet'}
+                                    {isSaving ? (
+                                        <><span className="spinner-small"></span>Kaydediliyor...</>
+                                    ) : (
+                                        'Kelimeyi Kaydet'
+                                    )}
                                 </button>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <p className="no-translation">Bu kelime için çeviri bulunamadı.</p>
+                    <div className="no-translation">
+                        <p>Bu kelime için çeviri bulunamadı.</p>
+                        <small>Yeni çeviri eklemek için yönetici ile iletişime geçin.</small>
+                    </div>
                 )}
             </div>
-            {saveError && <p className="error-message">{saveError}</p>}
+            {saveError && (
+                <div className="error-message">
+                    <i className="error-icon">⚠️</i>
+                    <p>{saveError}</p>
+                </div>
+            )}
         </div>
     );
 };

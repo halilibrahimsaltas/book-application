@@ -23,7 +23,7 @@ const BookReader = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.get(`/books/${id}`);
+            const response = await api.get(`/api/books/${id}`);
             setBook(response.data);
             
             // Split content by "=== Page X ==="
