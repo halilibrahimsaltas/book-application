@@ -78,8 +78,8 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             }
             
             await api.post('/api/saved-words', {
-                englishWord: translation.english,
-                turkishWord: translation.turkish,
+                englishWord: translation.enWord,
+                turkishWord: translation.trWord,
                 type: translation.type || 'Belirtilmemiş',
                 category: translation.category || 'Genel',
                 bookId: bookId
@@ -136,8 +136,8 @@ const WordCard = ({ word, onClose, position, bookId }) => {
                                 <div className="translation-header">
                                     <span className="word-type">{translation.type || 'Belirtilmemiş'}</span>
                                 </div>
-                                <p className="english-word">{translation.english}</p>
-                                <p className="turkish-translation">Anlam: {translation.turkish}</p>
+                                <p className="english-word">{translation.enWord}</p>
+                                <p className="turkish-translation">Anlam: {translation.trWord}</p>
                                 <p className="category-tag">Kategori: {translation.category || 'Genel'}</p>
                                 <button 
                                     className={`save-button ${isSaving ? 'saving' : ''}`}
