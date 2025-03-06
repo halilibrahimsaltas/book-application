@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const BookIcon = () => (
@@ -18,45 +18,33 @@ const WordIcon = () => (
 
 const Navbar = () => {
   const location = useLocation();
-  const isAuthenticated = localStorage.getItem('token');
-  const isLoginPage = location.pathname === '/login' || location.pathname === '/signup';
+  const navigate = useNavigate();
 
-  if (isLoginPage) return null;
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const isActive = (path) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
+    return location.pathname === path ? 'active' : '';
   };
 
   return (
     <nav className="navbar">
       <div className="nav-container">
         <div className="nav-left">
-          <Link to={isAuthenticated ? "/dashboard" : "/"} className="nav-brand">
-            <BookIcon />
-            <span>Kitaplık</span>
+          <Link to="/dashboard" className={`nav-link ${isActive('/dashboard')}`}>
+            Kitaplık
+          </Link>
+          <Link to="/saved-words" className={`nav-link ${isActive('/saved-words')}`}>
+            Kaydedilen Kelimeler
           </Link>
         </div>
-        {isAuthenticated && (
-          <div className="nav-right">
-            <Link 
-              to="/dashboard" 
-              className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
-            >
-              <BookIcon />
-              <span>Kitaplarım</span>
-            </Link>
-            <Link 
-              to="/saved-words" 
-              className={`nav-link ${isActive('/saved-words') ? 'active' : ''}`}
-            >
-              <WordIcon />
-              <span>Kelimelerim</span>
-            </Link>
-          </div>
-        )}
+        <div className="nav-right">
+          <button onClick={handleLogout} className="logout-button">
+            Çıkış Yap
+          </button>
+        </div>
       </div>
     </nav>
   );

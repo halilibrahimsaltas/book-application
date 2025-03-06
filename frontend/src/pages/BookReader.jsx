@@ -16,8 +16,24 @@ const BookReader = () => {
     const [wordCardPosition, setWordCardPosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
+        // Sayfa yüklendiğinde body'ye özel class ekle
+        document.body.classList.add('book-reader-page');
+        
         fetchBookDetails();
+
+        // Component unmount olduğunda class'ı kaldır
+        return () => {
+            document.body.classList.remove('book-reader-page');
+        };
     }, [id]);
+
+    // Sayfa değişikliğini takip et
+    useEffect(() => {
+        const contentElement = document.querySelector('.book-content');
+        if (contentElement) {
+            contentElement.scrollTop = 0;
+        }
+    }, [currentPage]);
 
     const fetchBookDetails = async () => {
         try {
@@ -40,12 +56,16 @@ const BookReader = () => {
     const goToNextPage = () => {
         if (currentPage < bookContent.length - 1) {
             setCurrentPage(currentPage + 1);
+            // Sayfanın başına kaydır
+            document.querySelector('.book-content').scrollTop = 0;
         }
     };
 
     const goToPreviousPage = () => {
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
+            // Sayfanın başına kaydır
+            document.querySelector('.book-content').scrollTop = 0;
         }
     };
 

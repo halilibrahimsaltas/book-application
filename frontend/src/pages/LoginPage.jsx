@@ -1,81 +1,76 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   // Sayfa yüklendiğinde token kontrolü yap
-  useEffect(() => {
+  React.useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       navigate('/dashboard');
     }
   }, [navigate]);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/api/auth/login", {
-        username,
-        password,
-      });
-      
-      if (response.data.token) {
-        // Token'ı localStorage'a kaydet
-        localStorage.setItem('token', response.data.token);
-        
-        // Kullanıcıyı dashboard'a yönlendir
-        navigate("/dashboard");
-      } else {
-        setError("Token alınamadı. Lütfen tekrar deneyin.");
-      }
+      const response = await api.post('/api/auth/login', credentials);
+      localStorage.setItem('token', response.data.token);
+      navigate('/dashboard');
     } catch (error) {
-      if (error.response) {
-        // Sunucudan gelen hata mesajını göster
-        setError(error.response.data.message || "Giriş başarısız. Lütfen kullanıcı adı ve şifrenizi kontrol edin.");
-      } else if (error.request) {
-        // Sunucuya ulaşılamadı
-        setError("Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.");
-      } else {
-        // Diğer hatalar
-        setError("Bir hata oluştu. Lütfen tekrar deneyin.");
-      }
-      console.error("Login error:", error);
+      setError('Kullanıcı adı veya şifre hatalı');
+      console.error('Login error:', error);
     }
   };
 
+  const handleChange = (e) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value
+    });
+  };
+
   return (
-    <div className="login-container">
-      <h2>Giriş Yap</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleLogin}>
-        <div>
-          <input
-            type="text"
-            placeholder="Kullanıcı Adı"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="Şifre"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Giriş Yap</button>
-      </form>
-      <p className="auth-link">
-        Hesabınız yok mu? <Link to="/signup">Kayıt Ol</Link>
-      </p>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2>Giriş Yap</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input
+              type="text"
+              name="username"
+              placeholder="Kullanıcı Adı"
+              value={credentials.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="password"
+              name="password"
+              placeholder="Şifre"
+              value={credentials.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="auth-button">
+            Giriş Yap
+          </button>
+        </form>
+        <p className="auth-link">
+          Hesabınız yok mu? <Link to="/signup">Kayıt Ol</Link>
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import BookCard from '../components/BookCard';
 import './Dashboard.css';
@@ -14,6 +14,7 @@ const Dashboard = () => {
     author: ''
   });
   const [selectedFile, setSelectedFile] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,13 +23,14 @@ const Dashboard = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await api.get("/api/books");
+      setLoading(true);
+      const response = await api.get('/api/books');
       setBooks(response.data);
-      setLoading(false);
     } catch (error) {
-      setError('Kitaplar yüklenirken bir hata oluştu.');
+      setError('Kitaplar yüklenirken bir hata oluştu');
+      console.error('Kitaplar yüklenirken hata:', error);
+    } finally {
       setLoading(false);
-      console.error("Error fetching books:", error);
     }
   };
 
@@ -61,42 +63,50 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
-  const handleViewSavedWords = () => {
-    navigate('/saved-words');
-  };
+  const filteredBooks = books.filter(book =>
+    book.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
-    return <div className="dashboard-loading">Kitaplar yükleniyor...</div>;
+    return (
+      <div className="dashboard-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Kitaplar yükleniyor...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="dashboard-error">{error}</div>;
+    return (
+      <div className="dashboard-container">
+        <div className="error-message">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1>Kitaplık</h1>
+      <div className="dashboard-header">
+        <h2>Kitaplık</h2>
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Kitap ara..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
         <div className="header-buttons">
           <button onClick={() => setShowAddBook(!showAddBook)} className="add-book-button">
             {showAddBook ? 'İptal' : 'Yeni Kitap Ekle'}
           </button>
-          <button onClick={handleLogout} className="logout-button">
-            Çıkış Yap
-          </button>
-          <button 
-            className="view-saved-words-btn"
-            onClick={handleViewSavedWords}
-          >
-            Tüm Kaydedilen Kelimeler
-          </button>
         </div>
-      </header>
+      </div>
 
       {showAddBook && (
         <form onSubmit={handleAddBook} className="add-book-form">
@@ -122,20 +132,19 @@ const Dashboard = () => {
       )}
 
       <div className="books-grid">
-        {books.map((book) => (
-          <BookCard
-            key={book.id}
-            book={book}
-            onSaveWord={() => {}}
-          />
-        ))}
+        {filteredBooks.length > 0 ? (
+          filteredBooks.map((book) => (
+            <BookCard
+              key={book.id}
+              book={book}
+            />
+          ))
+        ) : (
+          <div className="no-books-message">
+            {searchTerm ? 'Aranan kitap bulunamadı.' : 'Henüz kitap eklenmemiş.'}
+          </div>
+        )}
       </div>
-
-      {books.length === 0 && !loading && (
-        <div className="no-books-message">
-          Henüz kitap eklenmemiş. Yeni kitap eklemek için "Yeni Kitap Ekle" butonuna tıklayın.
-        </div>
-      )}
     </div>
   );
 };

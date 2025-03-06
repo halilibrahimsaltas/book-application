@@ -29,32 +29,31 @@ const BookCard = ({ book }) => {
     });
   };
 
-  const handleCardClick = () => {
+  const handleReadClick = () => {
     navigate(`/books/${book.id}/read`);
   };
 
   const handleSavedWordsClick = (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    navigate(`/books/${book.id}/words`);
+    navigate(`/saved-words`, { state: { bookId: book.id } });
   };
 
   return (
-    <div className="book-card" onClick={handleCardClick}>
-      <div className="book-card-header">
-        <div className="book-title-container">
-          <BookIcon />
-          <h3 className="book-title">{book.title}</h3>
-        </div>
-        <p className="book-author">Yazar: {book.author}</p>
+    <div className="book-card">
+      <div className="book-info">
+        <h3 className="book-title">{book.title}</h3>
+        <p className="book-author">{book.author}</p>
+        {book.description && (
+          <p className="book-description">{book.description}</p>
+        )}
       </div>
-  
-      <div className="book-card-footer">
-        <button 
-          className="book-card-button primary"
-          onClick={handleSavedWordsClick}
-        >
-          <WordIcon />
-          Kaydedilen Kelimeler
+      <div className="book-actions">
+        <button onClick={handleReadClick} className="read-button">
+          Okumaya Başla
+        </button>
+        <button onClick={handleSavedWordsClick} className="saved-words-button">
+          Bu Kitabın Kelimeleri
         </button>
       </div>
     </div>
@@ -66,9 +65,7 @@ BookCard.propTypes = {
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    filePath: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired
+    description: PropTypes.string
   }).isRequired
 };
 

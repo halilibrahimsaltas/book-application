@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import './SavedWords.css';
 
@@ -7,8 +7,9 @@ const SavedWords = () => {
   const [savedWords, setSavedWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { bookId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const bookId = location.state?.bookId;
 
   useEffect(() => {
     const fetchSavedWords = async () => {

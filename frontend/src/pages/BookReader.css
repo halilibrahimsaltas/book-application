@@ -1,15 +1,37 @@
+/* Body stili - BookReader sayfası için */
+body.book-reader-page {
+    background-color: #f8f9fa;
+}
+
+body.book-reader-page .navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+body.book-reader-page .navbar .nav-container {
+    width: 900px !important;
+    max-width: 900px !important;
+    padding: 0;
+}
+
 /* Ana konteyner */
 .book-reader-container {
     width: 900px;
     margin: 0 auto;
     padding: 1rem 1rem 1rem 0;
     background-color: #fff;
-    min-height: 100vh;
+    min-height: calc(100vh - 64px);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     position: relative;
+}
+
+/* BookReader sayfası için özel navbar stili */
+.book-reader-container ~ .navbar .nav-container {
+    width: 900px !important;
+    max-width: 900px !important;
 }
 
 /* Başlık */
@@ -133,13 +155,16 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 920px) {
+    body.book-reader-page .navbar .nav-container,
     .book-reader-container,
     .book-reader-header,
     .book-content,
     .page-controls {
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .book-reader-container {
