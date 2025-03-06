@@ -43,6 +43,9 @@ public class Book {
     @Column(name = "file_path", length = 1000)
     private String filePath;
 
+    @Column(name = "image_path", length = 1000)
+    private String imagePath;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

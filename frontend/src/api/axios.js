@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    withCredentials: true,
+    baseURL: '/api',
     headers: {
         'Content-Type': 'application/json'
     }
@@ -23,23 +23,13 @@ api.interceptors.request.use(
 
 // Response interceptor
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        return response;
+    },
     (error) => {
-        if (error.response) {
-            // Token süresi dolmuşsa
-            if (error.response.status === 401) {
-                localStorage.removeItem('token');
-                // Eğer login sayfasında değilsek, login sayfasına yönlendir
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
-                }
-            }
-            // Diğer hata durumları
-            console.error('API Error:', error.response.data);
-        } else if (error.request) {
-            console.error('Network Error:', error.request);
-        } else {
-            console.error('Error:', error.message);
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

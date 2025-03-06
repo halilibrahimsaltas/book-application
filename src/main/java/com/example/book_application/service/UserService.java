@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.book_application.core.excepiton.ResourceNotFoundException;
+import com.example.book_application.dto.UserProfileResponse;
+import com.example.book_application.dto.UserProfileUpdateRequest;
 import com.example.book_application.model.User;
 import com.example.book_application.repository.UserRepository;
+import com.example.book_application.repository.BookProgressRepository;
+import com.example.book_application.repository.SavedWordRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +31,8 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BookProgressRepository bookProgressRepository;
+    private final SavedWordRepository savedWordRepository;
 
     public User saveUser(User user) {
         log.info("Yeni kullanıcı kaydediliyor: {}", user.getUsername());
@@ -123,5 +129,55 @@ public class UserService implements UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return findByUsername(username);
+    }
+
+    public UserProfileResponse getUserProfile(String username) {
+        User user = findByUsername(username);
+        
+        // İstatistikleri hesapla
+        Integer totalBooks = bookProgressRepository.countDistinctBooksByUserId(user.getId());
+        Integer totalSavedWords = savedWordRepository.countByUserId(user.getId());
+        Long totalReadingTime = bookProgressRepository.sumTotalReadingTimeByUserId(user.getId());
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .totalBooks(totalBooks)
+                .totalSavedWords(totalSavedWords)
+                .totalReadingTime(totalReadingTime != null ? totalReadingTime : 0L)
+                .build();
+    }
+
+    public UserProfileResponse updateUserProfile(String username, UserProfileUpdateRequest request) {
+        User user = findByUsername(username);
+
+        // Kullanıcı adı değişikliği kontrolü
+        if (!user.getUsername().equals(request.getUsername())) {
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                throw new RuntimeException("Bu kullanıcı adı zaten kullanımda");
+            }
+            user.setUsername(request.getUsername());
+        }
+
+        // Email değişikliği kontrolü
+        if (!user.getEmail().equals(request.getEmail())) {
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                throw new RuntimeException("Bu email zaten kullanımda");
+            }
+            user.setEmail(request.getEmail());
+        }
+
+        // Şifre değişikliği kontrolü
+        if (request.getCurrentPassword() != null && request.getNewPassword() != null) {
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new RuntimeException("Mevcut şifre yanlış");
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+
+        userRepository.save(user);
+        return getUserProfile(user.getUsername());
     }
 }

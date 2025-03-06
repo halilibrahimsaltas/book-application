@@ -4,13 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.List;
 
 import com.example.book_application.model.User;
 import com.example.book_application.service.UserService;
 import com.example.book_application.dto.LoginRequest;
 import com.example.book_application.dto.LoginResponse;
+import com.example.book_application.dto.UserProfileResponse;
+import com.example.book_application.dto.UserProfileUpdateRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,9 +72,27 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public User getCurrentUserProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userService.findByUsername(username);
+    public ResponseEntity<UserProfileResponse> getUserProfile(Authentication authentication) {
+        log.info("Profil bilgileri isteniyor: {}", authentication.getName());
+        UserProfileResponse profile = userService.getUserProfile(authentication.getName());
+        return ResponseEntity.ok(profile);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserProfileResponse> updateUserProfile(
+            Authentication authentication,
+            @RequestBody UserProfileUpdateRequest request) {
+        log.info("Profil güncelleme isteği: {}", authentication.getName());
+        
+        try {
+            UserProfileResponse updatedProfile = userService.updateUserProfile(
+                authentication.getName(), 
+                request
+            );
+            return ResponseEntity.ok(updatedProfile);
+        } catch (RuntimeException e) {
+            log.error("Profil güncellenirken hata: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

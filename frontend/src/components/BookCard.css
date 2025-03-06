@@ -1,39 +1,120 @@
 .book-card {
   background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  transition: all 0.2s ease;
   height: 100%;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .book-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background-color: #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  background-color: #f1f5f9;
+}
+
+.book-cover img.fallback-image {
+  object-fit: contain;
+  padding: 1rem;
+  background-color: #f8fafc;
+}
+
+.book-cover:hover img:not(.fallback-image) {
+  transform: scale(1.05);
+}
+
+.book-actions-overlay {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.book-cover:hover .book-actions-overlay {
+  opacity: 1;
+}
+
+.action-button {
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.delete-button:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .book-info {
-  flex: 1;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  z-index: 1;
 }
 
 .book-title {
   color: #1e293b;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   line-height: 1.4;
 }
 
 .book-author {
   color: #64748b;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .book-description {
@@ -48,26 +129,32 @@
 }
 
 .book-actions {
+  padding: 0.75rem;
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  border-top: 1px solid #f1f5f9;
   margin-top: auto;
+  z-index: 1;
 }
 
-.read-button,
-.saved-words-button {
+.book-action-btn {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 0.875rem;
   font-weight: 500;
-  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+}
+
+.book-action-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .read-button {
@@ -75,87 +162,69 @@
   color: white;
 }
 
-.read-button:hover {
+.read-button:hover:not(:disabled) {
   background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .saved-words-button {
   background-color: #f1f5f9;
   color: #475569;
-  border: 1px solid #e2e8f0;
 }
 
-.saved-words-button:hover {
+.saved-words-button:hover:not(:disabled) {
   background-color: #e2e8f0;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(226, 232, 240, 0.4);
-  color: #1e293b;
 }
 
-.book-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
+@media (max-width: 640px) {
+  .book-info {
+    padding: 0.75rem;
+  }
 
-.delete-button {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: #666;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
+  .book-actions {
+    padding: 0.5rem;
+  }
 
-.delete-button:hover {
-  color: #ff4444;
-  background-color: rgba(255, 68, 68, 0.1);
-}
+  .book-action-btn {
+    padding: 0.375rem;
+    font-size: 0.75rem;
+  }
 
-.delete-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  .action-button {
+    width: 28px;
+    height: 28px;
+  }
 
-.delete-icon {
-  width: 20px;
-  height: 20px;
+  .book-actions-overlay {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
   .book-card {
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0;
   }
 
   .book-info {
-    gap: 0.5rem;
+    padding: 0.75rem;
+    gap: 0.25rem;
   }
 
   .book-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
 
-  .book-author,
-  .book-description {
-    font-size: 0.9rem;
+  .book-author {
+    font-size: 0.85rem;
   }
 
   .book-actions {
-    flex-direction: column;
+    padding: 0.5rem;
+    flex-direction: row;
   }
 
-  .read-button,
-  .saved-words-button {
-    width: 100%;
-    padding: 0.6rem;
-    font-size: 0.9rem;
+  .book-action-btn {
+    padding: 0.5rem;
+    font-size: 0.8rem;
   }
 }

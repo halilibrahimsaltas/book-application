@@ -5,37 +5,45 @@ import api from '../api/axios';
 import { useState } from 'react';
 
 const DeleteIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" className="delete-icon">
-    <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
   </svg>
 );
 
-const BookIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" className="book-icon">
-    <g stroke="none" strokeWidth="1" fill="currentColor" fillRule="evenodd">
-      <path d="M6,2 L18,2 C19.1045695,2 20,2.8954305 20,4 L20,20 C20,21.1045695 19.1045695,22 18,22 L6,22 C4.8954305,22 4,21.1045695 4,20 L4,4 C4,2.8954305 4.8954305,2 6,2 Z" />
-    </g>
+const ReadIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
   </svg>
 );
 
 const WordIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" className="word-icon">
-    <path fill="currentColor" d="M14 4v8H2V4h12m1-1H1v10h14V3z M3 8h10v1H3z"/>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+    <path d="M7 12h10v2H7zm0-4h10v2H7zm0 8h7v2H7z"/>
   </svg>
 );
 
 const BookCard = ({ book, onDelete }) => {
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
-  // Tarih formatlamak için yardımcı fonksiyon
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/default-book-cover.jpg';
+    
+    // Eğer tam URL ise doğrudan kullan
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    // Eğer /api ile başlıyorsa, baseURL'i kullan
+    if (imagePath.startsWith('/api')) {
+      return `${import.meta.env.VITE_API_URL}${imagePath}`;
+    }
+    
+    // Diğer durumlar için /api ekle
+    return `${import.meta.env.VITE_API_URL}/api${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };
 
   const handleReadClick = () => {
@@ -68,31 +76,51 @@ const BookCard = ({ book, onDelete }) => {
     }
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+    console.log('Resim yüklenemedi:', book.imagePath);
+  };
+
   return (
     <div className="book-card">
-      <div className="book-info">
-        <div className="book-header">
-          <h3 className="book-title">{book.title}</h3>
+      <div className="book-cover">
+        <img 
+          src={imageError ? '/default-book-cover.jpg' : getImageUrl(book.imagePath)}
+          alt={book.title}
+          onError={handleImageError}
+          className={imageError ? 'fallback-image' : ''}
+        />
+        <div className="book-actions-overlay">
           <button 
             onClick={handleDeleteClick}
-            className="delete-button"
-            disabled={isDeleting}
+            className="action-button delete-button"
+            disabled={isDeleting || isLoading}
             title="Kitabı Sil"
           >
             <DeleteIcon />
           </button>
         </div>
+      </div>
+      <div className="book-info">
+        <h3 className="book-title">{book.title}</h3>
         <p className="book-author">{book.author}</p>
-        {book.description && (
-          <p className="book-description">{book.description}</p>
-        )}
       </div>
       <div className="book-actions">
-        <button onClick={handleReadClick} className="read-button">
-          Okumaya Başla
+        <button 
+          onClick={handleReadClick} 
+          className="book-action-btn read-button"
+          disabled={isLoading}
+        >
+          <ReadIcon />
+          Oku
         </button>
-        <button onClick={handleSavedWordsClick} className="saved-words-button">
-          Bu Kitabın Kelimeleri
+        <button 
+          onClick={handleSavedWordsClick} 
+          className="book-action-btn saved-words-button"
+          disabled={isLoading}
+        >
+          <WordIcon />
+          Kelimeler
         </button>
       </div>
     </div>
@@ -104,7 +132,8 @@ BookCard.propTypes = {
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
-    description: PropTypes.string
+    imagePath: PropTypes.string,
+    content: PropTypes.string
   }).isRequired,
   onDelete: PropTypes.func
 };

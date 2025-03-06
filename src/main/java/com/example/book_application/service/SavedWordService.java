@@ -57,12 +57,16 @@ public class SavedWordService {
 
             English english = enRepository.findByWord(request.getEnglishWord());
             if (english == null) {
-                throw new ResourceNotFoundException("İngilizce kelime bulunamadı: " + request.getEnglishWord());
+                english = new English();
+                english.setWord(request.getEnglishWord());
+                english = enRepository.save(english);
             }
 
             Turkish turkish = trRepository.findByWord(request.getTurkishWord());
             if (turkish == null) {
-                throw new ResourceNotFoundException("Türkçe kelime bulunamadı: " + request.getTurkishWord());
+                turkish = new Turkish();
+                turkish.setWord(request.getTurkishWord());
+                turkish = trRepository.save(turkish);
             }
 
             boolean isWordAlreadySaved = isWordAlreadySaved(user.getId(), request.getEnglishWord());
@@ -166,14 +170,7 @@ public class SavedWordService {
         List<SavedWord> savedWords = savedWordRepository.findByBookIdAndUserId(bookId, userId);
         
         return savedWords.stream()
-            .map(word -> SavedWordResponse.builder()
-                .id(word.getId())
-                .englishWord(word.getEnglish().getWord())
-                .turkishWord(word.getTurkish().getWord())
-                .bookId(word.getBook().getId())
-                .bookTitle(word.getBook().getTitle())
-                .createdAt(word.getSavedDate())
-                .build())
+            .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
 

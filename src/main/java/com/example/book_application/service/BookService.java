@@ -27,12 +27,12 @@ public class BookService {
     private final BookProgressRepository bookProgressRepository;
     private final UserService userService;
 
-    public Book saveBook(Book book, String pdfPath) throws IOException {
+    public Book saveBook(Book book, String pdfPath, String imagePath) throws IOException {
         book.setFilePath(pdfPath);
-        book.setContent(PdfExtractor.extractTextFromPdf(pdfPath)); // ✅ Extract text
+        book.setImagePath(imagePath);
+        book.setContent(PdfExtractor.extractTextFromPdf(pdfPath));
         return bookRepository.save(book);
     }
-
 
     public Book findByTitle(String title) {
         log.info("Finding book by title: {}", title);
@@ -56,11 +56,29 @@ public class BookService {
         Book book = findById(id);
         book.setTitle(bookDetails.getTitle());
         book.setAuthor(bookDetails.getAuthor());
+        if (bookDetails.getImagePath() != null) {
+            book.setImagePath(bookDetails.getImagePath());
+        }
         return bookRepository.save(book);
     }
 
     public void deleteBook(Long id) {
         Book book = findById(id);
+        // Dosyaları sil
+        if (book.getFilePath() != null) {
+            try {
+                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(book.getFilePath()));
+            } catch (IOException e) {
+                log.error("PDF dosyası silinirken hata oluştu: {}", e.getMessage());
+            }
+        }
+        if (book.getImagePath() != null) {
+            try {
+                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(book.getImagePath()));
+            } catch (IOException e) {
+                log.error("Resim dosyası silinirken hata oluştu: {}", e.getMessage());
+            }
+        }
         bookRepository.delete(book);
     }
 
