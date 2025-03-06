@@ -137,6 +137,9 @@ const Dashboard = () => {
             <BookCard
               key={book.id}
               book={book}
+              onDelete={(deletedBookId) => {
+                setBooks(books.filter(b => b.id !== deletedBookId));
+              }}
             />
           ))
         ) : (

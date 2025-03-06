@@ -1,6 +1,14 @@
 import PropTypes from 'prop-types';
 import './BookCard.css';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+import { useState } from 'react';
+
+const DeleteIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" className="delete-icon">
+    <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+  </svg>
+);
 
 const BookIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" className="book-icon">
@@ -16,8 +24,9 @@ const WordIcon = () => (
   </svg>
 );
 
-const BookCard = ({ book }) => {
+const BookCard = ({ book, onDelete }) => {
   const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Tarih formatlamak için yardımcı fonksiyon
   const formatDate = (dateString) => {
@@ -39,10 +48,40 @@ const BookCard = ({ book }) => {
     navigate(`/saved-words`, { state: { bookId: book.id } });
   };
 
+  const handleDeleteClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (window.confirm('Bu kitabı silmek istediğinizden emin misiniz?')) {
+      try {
+        setIsDeleting(true);
+        await api.delete(`/api/books/${book.id}`);
+        if (onDelete) {
+          onDelete(book.id);
+        }
+      } catch (error) {
+        console.error('Kitap silinirken hata oluştu:', error);
+        alert('Kitap silinirken bir hata oluştu.');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
   return (
     <div className="book-card">
       <div className="book-info">
-        <h3 className="book-title">{book.title}</h3>
+        <div className="book-header">
+          <h3 className="book-title">{book.title}</h3>
+          <button 
+            onClick={handleDeleteClick}
+            className="delete-button"
+            disabled={isDeleting}
+            title="Kitabı Sil"
+          >
+            <DeleteIcon />
+          </button>
+        </div>
         <p className="book-author">{book.author}</p>
         {book.description && (
           <p className="book-description">{book.description}</p>
@@ -66,7 +105,8 @@ BookCard.propTypes = {
     title: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
     description: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  onDelete: PropTypes.func
 };
 
 export default BookCard;

@@ -79,12 +79,34 @@ const BookReader = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.get(`/api/books/${id}`);
-            setBook(response.data);
+            const [bookResponse, progressResponse] = await Promise.all([
+                api.get(`/api/books/${id}`),
+                api.get(`/api/books/${id}/progress`)
+            ]);
             
-            // Split content by "=== Page X ==="
-            const formattedContent = response.data.content.split(/=== Page \d+ ===/).filter(text => text.trim() !== "");
+            setBook(bookResponse.data);
+            
+            // İçeriği düzgün paragraflar halinde böl
+            const content = bookResponse.data.content;
+            const formattedContent = content
+                .split(/=== Page \d+ ===/)
+                .filter(text => text.trim() !== "")
+                .map(pageContent => {
+                    // Birden fazla boş satırı tek boş satıra indir
+                    return pageContent.replace(/\n\s*\n/g, '\n\n')
+                        // Satır sonlarındaki tire işaretlerini kaldır ve kelimeleri birleştir
+                        .replace(/(\w+)-\n(\w+)/g, '$1$2')
+                        // Satır sonlarını boşluğa çevir (cümlelerin devamı için)
+                        .replace(/(?<!\n)\n(?!\n)/g, ' ')
+                        .trim();
+                });
+            
             setBookContent(formattedContent);
+            
+            // Eğer okuma ilerlemesi varsa, son kaldığı sayfadan devam et
+            if (progressResponse.data) {
+                setCurrentPage(progressResponse.data.currentPage);
+            }
         } catch (error) {
             setError(error.response?.data?.error || 'Kitap bilgileri yüklenirken bir hata oluştu.');
             console.error('Error fetching book details:', error);
@@ -93,9 +115,23 @@ const BookReader = () => {
         }
     };
 
+    // Sayfa değiştiğinde ilerlemeyi kaydet
+    const saveProgress = async (pageNumber) => {
+        try {
+            await api.post(`/api/books/${id}/progress`, {
+                currentPage: pageNumber,
+                totalPages: bookContent.length
+            });
+        } catch (error) {
+            console.error('Error saving progress:', error);
+        }
+    };
+
     const goToNextPage = () => {
         if (currentPage < bookContent.length - 1) {
-            setCurrentPage(currentPage + 1);
+            const newPage = currentPage + 1;
+            setCurrentPage(newPage);
+            saveProgress(newPage);
             // Sayfanın başına kaydır
             document.querySelector('.book-content').scrollTop = 0;
         }
@@ -103,7 +139,9 @@ const BookReader = () => {
 
     const goToPreviousPage = () => {
         if (currentPage > 0) {
-            setCurrentPage(currentPage - 1);
+            const newPage = currentPage - 1;
+            setCurrentPage(newPage);
+            saveProgress(newPage);
             // Sayfanın başına kaydır
             document.querySelector('.book-content').scrollTop = 0;
         }
@@ -165,7 +203,7 @@ const BookReader = () => {
             </div>
 
             <div className="book-content">
-                {bookContent[currentPage]?.split('\n').map((paragraph, pIndex) => (
+                {bookContent[currentPage]?.split('\n\n').map((paragraph, pIndex) => (
                     <p key={pIndex}>
                         {paragraph.trim().split(/\s+/).map((word, wIndex) => (
                             <span

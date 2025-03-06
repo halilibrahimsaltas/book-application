@@ -75,7 +75,7 @@ public class BookService {
 
             // Kullanıcının ilerleme kaydını bul veya oluştur
             BookProgress progress = bookProgressRepository
-                .findByUserIdAndBookId(currentUser.getId(), bookId)
+                .findByUserAndBook(currentUser, book)
                 .orElseGet(() -> {
                     BookProgress newProgress = new BookProgress();
                     newProgress.setUser(currentUser);
