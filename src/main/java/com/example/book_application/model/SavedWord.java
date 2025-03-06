@@ -7,8 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "saved_word")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SavedWord {
@@ -16,31 +15,36 @@ public class SavedWord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
+    @ToString.Exclude
     private Book book;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "english_id")
+    @ToString.Exclude
     private English english;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "turkish_id")
+    @ToString.Exclude
     private Turkish turkish;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
+    @ToString.Exclude
     private Type type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @ToString.Exclude
     private Category category;
 
-    @CreationTimestamp
     @Column(name = "saved_date")
-    private LocalDateTime savedDate = LocalDateTime.now();
+    private LocalDateTime savedDate;
 }

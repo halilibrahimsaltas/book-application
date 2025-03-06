@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: '',
+    withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Content-Type': 'application/json'
     }
 });
 
@@ -12,21 +11,12 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
-        
-        // OPTIONS istekleri için Authorization header'ı ekleme
-        if (config.method?.toLowerCase() === 'options') {
-            return config;
-        }
-
-        // Token varsa ekle
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-
         return config;
     },
     (error) => {
-        console.error('Request error:', error);
         return Promise.reject(error);
     }
 );
@@ -34,33 +24,23 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
-
-        // Token hatası ve yeniden deneme yapılmamışsa
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            localStorage.removeItem('token');
-            
-            // Kullanıcıyı login sayfasına yönlendir
-            if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
-            }
-            return Promise.reject(error);
-        }
-
-        // Diğer hata durumları
+    (error) => {
         if (error.response) {
-            // Sunucu yanıtı ile dönen hatalar
-            console.error('Response error:', error.response.data);
+            // Token süresi dolmuşsa
+            if (error.response.status === 401) {
+                localStorage.removeItem('token');
+                // Eğer login sayfasında değilsek, login sayfasına yönlendir
+                if (!window.location.pathname.includes('/login')) {
+                    window.location.href = '/login';
+                }
+            }
+            // Diğer hata durumları
+            console.error('API Error:', error.response.data);
         } else if (error.request) {
-            // Sunucuya ulaşılamadığında
-            console.error('Network error:', error.request);
+            console.error('Network Error:', error.request);
         } else {
-            // Diğer hatalar
             console.error('Error:', error.message);
         }
-
         return Promise.reject(error);
     }
 );

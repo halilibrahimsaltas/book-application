@@ -65,6 +65,7 @@ const WordCard = ({ word, onClose, position, bookId }) => {
     const handleSaveWord = async (translation) => {
         if (!wordExists) {
             setSaveError('Bu kelime veritabanında bulunmadığı için kaydedilemez.');
+            showNotification('Bu kelime veritabanında bulunmadığı için kaydedilemez.', 'error');
             return;
         }
 
@@ -74,23 +75,51 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             
             const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('Kelime kaydetmek için giriş yapmalısınız');
+                const errorMsg = 'Kelime kaydetmek için giriş yapmalısınız';
+                setSaveError(errorMsg);
+                showNotification(errorMsg, 'error');
+                return;
             }
+
+            // Token'ı header'a ekle
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             
-            await api.post('/api/saved-words', {
+            const saveWordRequest = {
                 englishWord: translation.enWord,
                 turkishWord: translation.trWord,
-                type: translation.type || 'Belirtilmemiş',
-                category: translation.category || 'Genel',
                 bookId: bookId
-            });
+            };
+
+            console.debug('Kelime kaydetme isteği:', saveWordRequest);
             
-            showNotification('Kelime başarıyla kaydedildi!', 'success');
+            const response = await api.post('/api/saved-words', saveWordRequest);
+            
+            if (response.status === 200) {
+                showNotification('Kelime başarıyla kaydedildi!', 'success');
+            } else {
+                throw new Error('Beklenmeyen bir yanıt alındı');
+            }
         } catch (error) {
             console.error('Kelime kaydedilirken hata oluştu:', error);
-            const errorMessage = error.response?.data?.message || 
-                               error.message || 
-                               'Kelime kaydedilirken bir hata oluştu.';
+            let errorMessage;
+            
+            if (error.response) {
+                // Backend'den gelen hata
+                errorMessage = error.response.data || 'Sunucu hatası oluştu';
+                if (error.response.status === 401) {
+                    errorMessage = 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
+                    // Token'ı temizle ve kullanıcıyı login sayfasına yönlendir
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                }
+            } else if (error.request) {
+                // İstek yapıldı ama cevap alınamadı
+                errorMessage = 'Sunucuya ulaşılamıyor';
+            } else {
+                // İstek oluşturulurken hata oluştu
+                errorMessage = error.message || 'Kelime kaydedilirken bir hata oluştu';
+            }
+
             setSaveError(errorMessage);
             showNotification(errorMessage, 'error');
         } finally {
@@ -123,7 +152,10 @@ const WordCard = ({ word, onClose, position, bookId }) => {
             }}
         >
             <button className="close-button" onClick={onClose}>×</button>
-            <h3>{word}</h3>
+            <div className="word-header">
+                <h3>{cleanWord(word)}</h3>
+                <span className="search-info">Çeviriler</span>
+            </div>
             <div className="word-details">
                 {isLoading ? (
                     <div className="loading-spinner">

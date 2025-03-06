@@ -2,7 +2,7 @@ package com.example.book_application.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,75 +17,80 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;       
 
 @Service
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class SavedWordService {
 
     private final SavedWordRepository savedWordRepository;
-  
-    private final BookRepository bookRepository;
+    private final UserService userService;
+    private final BookService bookService;
     private final ENRepository enRepository;
     private final TRRepository trRepository;
-    private final TypeRepository typeRepository;
-    private final CategoryRepository categoryRepository;
 
-    @Transactional
-    public SavedWord saveSavedWord(SavedWordRequest request, User user) {
+    public boolean isWordAlreadySaved(Long userId, String englishWord) {
+        English english = enRepository.findByWord(englishWord);
+        if (english == null) {
+            return false;
+        }
+        return savedWordRepository.findByUserIdAndEnglishId(userId, english.getId()).isPresent();
+    }
+
+    public SavedWordResponse saveSavedWord(SavedWordRequest request, String username) {
+        log.info("Kelime kaydetme işlemi başlatıldı. Kullanıcı: {}, Kelime: {}", username, request.getEnglishWord());
+        
         try {
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                throw new ResourceNotFoundException("Kullanıcı bulunamadı: " + username);
+            }
+
             // Book kontrolü
-            Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+            Book book = null;
+            if (request.getBookId() != null) {
+                book = bookService.findById(request.getBookId());
+                if (book == null) {
+                    throw new ResourceNotFoundException("Kitap bulunamadı: " + request.getBookId());
+                }
+            }
 
-            // EN kelime kontrolü   
-            English english = enRepository.findByWord(request.getEnWord());
+            // English kelime kontrolü
+            English english = enRepository.findByWord(request.getEnglishWord());
             if (english == null) {
-                english = new English();
-                english.setWord(request.getEnWord());
-                english = enRepository.save(english);
+                throw new ResourceNotFoundException("İngilizce kelime bulunamadı: " + request.getEnglishWord());
             }
 
-            // TR kelime kontrolü
-            Turkish turkish = trRepository.findByWord(request.getTrWord());
+            // Turkish kelime kontrolü
+            Turkish turkish = trRepository.findByWord(request.getTurkishWord());
             if (turkish == null) {
-                turkish = new Turkish();
-                turkish.setWord(request.getTrWord());
-                turkish = trRepository.save(turkish);
+                throw new ResourceNotFoundException("Türkçe kelime bulunamadı: " + request.getTurkishWord());
             }
 
-            // Type kontrolü (opsiyonel)
-            Type type = null;
-            if (request.getType() != null) {
-                type = typeRepository.findByName(request.getType());
-                if (type == null) {
-                    type = new Type();
-                    type.setName(request.getType());
-                    type = typeRepository.save(type);
-                }
+            // Kelime daha önce kaydedilmiş mi kontrolü
+            boolean isWordAlreadySaved = isWordAlreadySaved(user.getId(), request.getEnglishWord());
+            if (isWordAlreadySaved) {
+                throw new IllegalStateException("Bu kelime zaten kaydedilmiş: " + request.getEnglishWord());
             }
 
-            // Category kontrolü (opsiyonel)
-            Category category = null;
-            if (request.getCategory() != null) {
-                category = categoryRepository.findByName(request.getCategory());
-                if (category == null) {
-                    category = new Category();
-                    category.setName(request.getCategory());
-                    category = categoryRepository.save(category);
-                }
-            }
-
-            // SavedWord oluştur
             SavedWord savedWord = new SavedWord();
             savedWord.setUser(user);
             savedWord.setBook(book);
             savedWord.setEnglish(english);
             savedWord.setTurkish(turkish);
-            savedWord.setType(type);
-            savedWord.setCategory(category);
+            savedWord.setSavedDate(LocalDateTime.now());
 
-            return savedWordRepository.save(savedWord);
+            savedWord = savedWordRepository.save(savedWord);
+            log.info("Kelime başarıyla kaydedildi. ID: {}", savedWord.getId());
+
+            return SavedWordResponse.builder()
+                    .id(savedWord.getId())
+                    .englishWord(english.getWord())
+                    .turkishWord(turkish.getWord())
+                    .savedDate(savedWord.getSavedDate())
+                    .build();
+
         } catch (Exception e) {
-            log.error("Error saving word: {}", e.getMessage());
+            log.error("Kelime kaydedilirken hata oluştu: {}", e.getMessage());
             throw e;
         }
     }
@@ -115,34 +120,14 @@ public class SavedWordService {
     public SavedWord updateSavedWord(Long id, SavedWordRequest request) {
         SavedWord savedWord = findById(id);
         
-        if (request.getTrWord() != null) {
-            Turkish tr = trRepository.findByWord(request.getTrWord());
+        if (request.getTurkishWord() != null) {
+            Turkish tr = trRepository.findByWord(request.getTurkishWord());
             if (tr == null) {
                 tr = new Turkish();
-                tr.setWord(request.getTrWord());
+                tr.setWord(request.getTurkishWord());
                 tr = trRepository.save(tr);
             }
             savedWord.setTurkish(tr);
-        }
-
-        if (request.getType() != null) {
-            Type type = typeRepository.findByName(request.getType());
-            if (type == null) {
-                type = new Type();
-                type.setName(request.getType());
-                type = typeRepository.save(type);
-            }
-            savedWord.setType(type);
-        }
-
-        if (request.getCategory() != null) {
-            Category category = categoryRepository.findByName(request.getCategory());
-            if (category == null) {
-                category = new Category();
-                category.setName(request.getCategory());
-                category = categoryRepository.save(category);
-            }
-            savedWord.setCategory(category);
         }
 
         return savedWordRepository.save(savedWord);
@@ -171,33 +156,11 @@ public class SavedWordService {
     }
 
     private SavedWordResponse convertToDTO(SavedWord savedWord) {
-        SavedWordResponse dto = new SavedWordResponse();
-        dto.setId(savedWord.getId());
-        
-        SavedWordResponse.UserDTO userDTO = new SavedWordResponse.UserDTO();
-        userDTO.setId(savedWord.getUser().getId());
-        userDTO.setUsername(savedWord.getUser().getUsername());
-        userDTO.setEmail(savedWord.getUser().getEmail());
-        dto.setUser(userDTO);
-        
-        SavedWordResponse.BookDTO bookDTO = new SavedWordResponse.BookDTO();
-        bookDTO.setId(savedWord.getBook().getId());
-        bookDTO.setTitle(savedWord.getBook().getTitle());
-        bookDTO.setAuthor(savedWord.getBook().getAuthor());
-        dto.setBook(bookDTO);
-        
-        SavedWordResponse.WordDTO wordDTO = new SavedWordResponse.WordDTO();
-        wordDTO.setEnWord(savedWord.getEnglish().getWord());
-        wordDTO.setTrWord(savedWord.getTurkish().getWord());
-        if (savedWord.getType() != null) {
-            wordDTO.setType(savedWord.getType().getName());
-        }
-        if (savedWord.getCategory() != null) {
-            wordDTO.setCategory(savedWord.getCategory().getName());
-        }
-        dto.setWord(wordDTO);
-        dto.setSavedDate(savedWord.getSavedDate());
-        
-        return dto;
+        return SavedWordResponse.builder()
+            .id(savedWord.getId())
+            .englishWord(savedWord.getEnglish().getWord())
+            .turkishWord(savedWord.getTurkish().getWord())
+            .savedDate(savedWord.getSavedDate())
+            .build();
     }
 }

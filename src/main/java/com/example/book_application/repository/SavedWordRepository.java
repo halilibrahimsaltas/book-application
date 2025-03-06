@@ -11,5 +11,5 @@ import com.example.book_application.model.SavedWord;
 @Repository
 public interface SavedWordRepository extends JpaRepository<SavedWord, Long> {
     List<SavedWord> findByUserId(Long userId);
-    Optional<SavedWord> findByUserIdAndEnglish_Id(Long userId, Long englishId);
+    Optional<SavedWord> findByUserIdAndEnglishId(Long userId, Long englishId);
 } 

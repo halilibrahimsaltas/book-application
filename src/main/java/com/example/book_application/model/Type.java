@@ -2,11 +2,11 @@ package com.example.book_application.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "type")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Type {
@@ -16,4 +16,9 @@ public class Type {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "type")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<SavedWord> savedWords;
 }
