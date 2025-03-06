@@ -1,15 +1,16 @@
 package com.example.book_application.dto;
 
-import lombok.*;
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class SavedWordResponse {
     private Long id;
     private String englishWord;
     private String turkishWord;
-    private LocalDateTime savedDate;
+    private Long bookId;
+    private String bookTitle;
+    private LocalDateTime createdAt;
 } 

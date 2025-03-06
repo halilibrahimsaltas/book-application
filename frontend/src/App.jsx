@@ -1,15 +1,16 @@
-import { useState } from 'react'
-import './App.css'
-import Router from './router'
+import { Outlet } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <Router />
-    </>
-  )
+    <div className="app">
+      <Navbar />
+      <main className="main-content">
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;

@@ -66,6 +66,10 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  const handleViewSavedWords = () => {
+    navigate('/saved-words');
+  };
+
   if (loading) {
     return <div className="dashboard-loading">Kitaplar yükleniyor...</div>;
   }
@@ -84,6 +88,12 @@ const Dashboard = () => {
           </button>
           <button onClick={handleLogout} className="logout-button">
             Çıkış Yap
+          </button>
+          <button 
+            className="view-saved-words-btn"
+            onClick={handleViewSavedWords}
+          >
+            Tüm Kaydedilen Kelimeler
           </button>
         </div>
       </header>

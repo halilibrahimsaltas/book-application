@@ -27,6 +27,8 @@ public class SavedWordService {
     private final BookService bookService;
     private final ENRepository enRepository;
     private final TRRepository trRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
     public boolean isWordAlreadySaved(Long userId, String englishWord) {
         English english = enRepository.findByWord(englishWord);
@@ -45,7 +47,6 @@ public class SavedWordService {
                 throw new ResourceNotFoundException("Kullanıcı bulunamadı: " + username);
             }
 
-            // Book kontrolü
             Book book = null;
             if (request.getBookId() != null) {
                 book = bookService.findById(request.getBookId());
@@ -54,19 +55,16 @@ public class SavedWordService {
                 }
             }
 
-            // English kelime kontrolü
             English english = enRepository.findByWord(request.getEnglishWord());
             if (english == null) {
                 throw new ResourceNotFoundException("İngilizce kelime bulunamadı: " + request.getEnglishWord());
             }
 
-            // Turkish kelime kontrolü
             Turkish turkish = trRepository.findByWord(request.getTurkishWord());
             if (turkish == null) {
                 throw new ResourceNotFoundException("Türkçe kelime bulunamadı: " + request.getTurkishWord());
             }
 
-            // Kelime daha önce kaydedilmiş mi kontrolü
             boolean isWordAlreadySaved = isWordAlreadySaved(user.getId(), request.getEnglishWord());
             if (isWordAlreadySaved) {
                 throw new IllegalStateException("Bu kelime zaten kaydedilmiş: " + request.getEnglishWord());
@@ -86,7 +84,9 @@ public class SavedWordService {
                     .id(savedWord.getId())
                     .englishWord(english.getWord())
                     .turkishWord(turkish.getWord())
-                    .savedDate(savedWord.getSavedDate())
+                    .bookId(book != null ? book.getId() : null)
+                    .bookTitle(book != null ? book.getTitle() : null)
+                    .createdAt(savedWord.getSavedDate())
                     .build();
 
         } catch (Exception e) {
@@ -155,12 +155,36 @@ public class SavedWordService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<SavedWordResponse> findByBookIdAndUserIdAsDTO(Long bookId, Long userId) {
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new ResourceNotFoundException("Kitap bulunamadı"));
+        
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Kullanıcı bulunamadı"));
+
+        List<SavedWord> savedWords = savedWordRepository.findByBookIdAndUserId(bookId, userId);
+        
+        return savedWords.stream()
+            .map(word -> SavedWordResponse.builder()
+                .id(word.getId())
+                .englishWord(word.getEnglish().getWord())
+                .turkishWord(word.getTurkish().getWord())
+                .bookId(word.getBook().getId())
+                .bookTitle(word.getBook().getTitle())
+                .createdAt(word.getSavedDate())
+                .build())
+            .collect(Collectors.toList());
+    }
+
     private SavedWordResponse convertToDTO(SavedWord savedWord) {
         return SavedWordResponse.builder()
             .id(savedWord.getId())
             .englishWord(savedWord.getEnglish().getWord())
             .turkishWord(savedWord.getTurkish().getWord())
-            .savedDate(savedWord.getSavedDate())
+            .bookId(savedWord.getBook() != null ? savedWord.getBook().getId() : null)
+            .bookTitle(savedWord.getBook() != null ? savedWord.getBook().getTitle() : null)
+            .createdAt(savedWord.getSavedDate())
             .build();
     }
 }

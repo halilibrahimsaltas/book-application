@@ -152,4 +152,30 @@ public class SavedWordController {
                 .body("Kelimeler getirilirken bir hata oluştu: " + e.getMessage());
         }
     }
+
+    @GetMapping("/book/{bookId}")
+    public ResponseEntity<?> getSavedWordsByBook(@PathVariable Long bookId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Kullanıcı girişi yapılmamış");
+            }
+
+            String username = authentication.getName();
+            User user = userService.findByUsername(username);
+            
+            log.info("Kitaba ait kayıtlı kelimeler getiriliyor, Kitap ID: {}, Kullanıcı: {}", bookId, username);
+            List<SavedWordResponse> words = savedWordService.findByBookIdAndUserIdAsDTO(bookId, user.getId());
+            return ResponseEntity.ok(words);
+        } catch (ResourceNotFoundException e) {
+            log.error("Kitap veya kelimeler bulunamadı: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Kitaba ait kelimeler getirilirken hata oluştu: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Kelimeler getirilirken bir hata oluştu: " + e.getMessage());
+        }
+    }
 }

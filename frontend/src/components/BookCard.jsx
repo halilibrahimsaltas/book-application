@@ -16,7 +16,7 @@ const WordIcon = () => (
   </svg>
 );
 
-const BookCard = ({ book, onSaveWord }) => {
+const BookCard = ({ book }) => {
   const navigate = useNavigate();
 
   // Tarih formatlamak için yardımcı fonksiyon
@@ -69,8 +69,7 @@ BookCard.propTypes = {
     description: PropTypes.string,
     filePath: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired
-  }).isRequired,
-  onSaveWord: PropTypes.func.isRequired
+  }).isRequired
 };
 
 export default BookCard;
