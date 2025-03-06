@@ -51,10 +51,27 @@ const BookReader = () => {
 
     const handleWordClick = (event, word) => {
         const rect = event.target.getBoundingClientRect();
-        setWordCardPosition({
-            x: rect.left,
-            y: rect.bottom + window.scrollY
-        });
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Kartın genişliği ve yüksekliği (tahmini değerler)
+        const cardWidth = 320;
+        const cardHeight = 400;
+        
+        let x = rect.left;
+        let y = rect.bottom + window.scrollY;
+        
+        // Sağ tarafa taşma kontrolü
+        if (x + cardWidth > viewportWidth) {
+            x = viewportWidth - cardWidth - 20;
+        }
+        
+        // Alt tarafa taşma kontrolü
+        if (y + cardHeight > viewportHeight + window.scrollY) {
+            y = rect.top + window.scrollY - cardHeight - 10;
+        }
+        
+        setWordCardPosition({ x, y });
         setSelectedWord(word);
     };
 

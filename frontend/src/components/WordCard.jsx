@@ -116,9 +116,10 @@ const WordCard = ({ word, onClose, position, bookId }) => {
         <div 
             className={`word-card ${showCard ? 'show' : ''}`}
             style={{
-                position: 'absolute',
-                left: `${position.x}px`,
-                top: `${position.y}px`
+                position: 'fixed',
+                left: Math.min(Math.max(position.x, 10), window.innerWidth - 260),
+                top: Math.min(Math.max(position.y, 10), window.innerHeight - 350),
+                zIndex: 1000
             }}
         >
             <button className="close-button" onClick={onClose}>×</button>
@@ -130,26 +131,22 @@ const WordCard = ({ word, onClose, position, bookId }) => {
                         <p>Çeviri yükleniyor...</p>
                     </div>
                 ) : translations.length > 0 ? (
-                    <div className="translations-list">
+                    <div className={`translations-list ${translations.length > 3 ? 'has-more' : ''}`}>
                         {translations.map((translation, index) => (
                             <div key={translation.id || index} className="translation-item">
-                                <div className="translation-header">
-                                    <span className="word-type">{translation.type || 'Belirtilmemiş'}</span>
-                                </div>
-                                <p className="english-word">{translation.enWord}</p>
-                                <p className="turkish-translation">Anlam: {translation.trWord}</p>
-                                <p className="category-tag">Kategori: {translation.category || 'Genel'}</p>
                                 <button 
                                     className={`save-button ${isSaving ? 'saving' : ''}`}
                                     onClick={() => handleSaveWord(translation)}
                                     disabled={isSaving}
+                                    title="Kelimeyi Kaydet"
                                 >
-                                    {isSaving ? (
-                                        <><span className="spinner-small"></span>Kaydediliyor...</>
-                                    ) : (
-                                        'Kelimeyi Kaydet'
-                                    )}
+                                    {isSaving ? '•' : '+'}
                                 </button>
+                                <div className="translation-header">
+                                    <span className="word-type">{translation.type || 'Belirtilmemiş'}</span>
+                                    <span className="category-tag">{translation.category || 'Genel'}</span>
+                                </div>
+                                <p className="turkish-translation">{translation.trWord}</p>
                             </div>
                         ))}
                     </div>
