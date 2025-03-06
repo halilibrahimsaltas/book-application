@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import './BookReader.css';
@@ -14,18 +14,58 @@ const BookReader = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedWord, setSelectedWord] = useState(null);
     const [wordCardPosition, setWordCardPosition] = useState({ x: 0, y: 0 });
+    const [isScrollingDown, setIsScrollingDown] = useState(false);
+    const lastScrollY = useRef(0);
+    const scrollTimeout = useRef(null);
+
+    const handleScroll = useCallback(() => {
+        const currentScrollY = window.scrollY;
+        const navbar = document.querySelector('.navbar');
+        
+        if (!navbar) return;
+
+        // En üstte veya en altta ise işlem yapma
+        if (currentScrollY <= 0 || currentScrollY + window.innerHeight >= document.documentElement.scrollHeight) {
+            navbar.classList.remove('hidden');
+            return;
+        }
+
+        // Scroll yönünü belirle ve minimum mesafe kontrolü
+        if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
+            if (currentScrollY > lastScrollY.current && !isScrollingDown) {
+                navbar.classList.add('hidden');
+                setIsScrollingDown(true);
+            } else if (currentScrollY < lastScrollY.current && isScrollingDown) {
+                navbar.classList.remove('hidden');
+                setIsScrollingDown(false);
+            }
+            lastScrollY.current = currentScrollY;
+        }
+    }, [isScrollingDown]);
 
     useEffect(() => {
-        // Sayfa yüklendiğinde body'ye özel class ekle
         document.body.classList.add('book-reader-page');
-        
         fetchBookDetails();
 
-        // Component unmount olduğunda class'ı kaldır
+        const debouncedScroll = () => {
+            if (scrollTimeout.current) {
+                window.cancelAnimationFrame(scrollTimeout.current);
+            }
+            scrollTimeout.current = window.requestAnimationFrame(() => {
+                handleScroll();
+            });
+        };
+
+        window.addEventListener('scroll', debouncedScroll, { passive: true });
+
         return () => {
             document.body.classList.remove('book-reader-page');
+            window.removeEventListener('scroll', debouncedScroll);
+            if (scrollTimeout.current) {
+                window.cancelAnimationFrame(scrollTimeout.current);
+            }
         };
-    }, [id]);
+    }, [id, handleScroll]);
 
     // Sayfa değişikliğini takip et
     useEffect(() => {
