@@ -42,6 +42,12 @@ const BookCard = ({ book, onDelete }) => {
       return `${import.meta.env.VITE_API_URL}${imagePath}`;
     }
     
+    // Eğer uploads klasörü yolu varsa, statik dosya URL'ine dönüştür
+    if (imagePath.includes('uploads/images/')) {
+      const fileName = imagePath.split('uploads/images/').pop();
+      return `${import.meta.env.VITE_API_URL}/api/images/${fileName}`;
+    }
+    
     // Diğer durumlar için /api ekle
     return `${import.meta.env.VITE_API_URL}/api${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };

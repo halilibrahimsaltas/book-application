@@ -39,6 +39,8 @@ public class SecurityConfig {
                 "/api/auth/**",
                 "/api/auth/login",
                 "/api/auth/register",
+                "/api/images/**",
+                "/api/translates/**",
                 "/error"
             ).permitAll()
             .requestMatchers(
@@ -47,7 +49,6 @@ public class SecurityConfig {
             ).authenticated()
             .requestMatchers("/api/books/**").authenticated()
             .requestMatchers("/api/saved-words/**").authenticated()
-            .requestMatchers("/api/translate/**").authenticated()
             .requestMatchers("/api/words/**").authenticated()
             .requestMatchers("/api/book-progress/**").authenticated()
             .anyRequest().authenticated()
