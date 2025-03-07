@@ -17,12 +17,20 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .profile-header h2 {
   margin: 0;
   font-size: 1.75rem;
   color: #1e293b;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .edit-button {
@@ -40,12 +48,38 @@
   background-color: #2563eb;
 }
 
-.edit-button.cancel {
-  background-color: #ef4444;
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f1f5f9;
+  color: #64748b;
 }
 
-.edit-button.cancel:hover {
-  background-color: #dc2626;
+.cancel-button:hover {
+  background-color: #e2e8f0;
+}
+
+.save-button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #22c55e;
+  color: white;
+  font-size: 1.1rem;
+  min-width: 120px;
+}
+
+.save-button:hover {
+  background-color: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .success-message {
@@ -101,31 +135,27 @@
 }
 
 .password-section {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .password-section h3 {
-  margin: 0 0 1.5rem;
   color: #1e293b;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 
-.save-button {
-  padding: 0.875rem;
-  border: none;
-  border-radius: 8px;
-  background-color: #2ecc71;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 1rem;
+.form-group input[type="password"] {
+  background-color: white;
 }
 
-.save-button:hover {
-  background-color: #27ae60;
+.form-group input[type="password"]::placeholder {
+  color: #94a3b8;
+  font-size: 0.9rem;
 }
 
 .profile-stats {
@@ -142,8 +172,8 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
 .stat-item {
@@ -190,6 +220,16 @@
   100% { transform: rotate(360deg); }
 }
 
+.password-error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .profile-container {
     padding: 1rem;
@@ -199,16 +239,48 @@
     padding: 1.5rem;
   }
 
-  .profile-header h2 {
-    font-size: 1.5rem;
+  .profile-header {
+    padding: 1rem;
+  }
+
+  .header-actions {
+    gap: 0.5rem;
+  }
+
+  .save-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .save-button, 
+  .cancel-button, 
+  .edit-button {
+    padding: 0.75rem 1rem;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
   }
-
-  .edit-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+  
+  .password-section {
+    padding: 1rem;
   }
 } 

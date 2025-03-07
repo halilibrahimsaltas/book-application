@@ -131,19 +131,24 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h2>Kitaplık</h2>
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Kitap ara..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+        <div className="header-left">
+          <h2>Kitaplık</h2>
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Kitap ara..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
         </div>
         <div className="header-buttons">
-          <button onClick={() => showAddBook ? resetForm() : setShowAddBook(true)} className="add-book-button">
-            {showAddBook ? 'İptal' : 'Yeni Kitap Ekle'}
+          <button 
+            onClick={() => showAddBook ? resetForm() : setShowAddBook(true)} 
+            className="add-book-button"
+          >
+            {showAddBook ? 'İptal' : '+ Yeni Kitap'}
           </button>
         </div>
       </div>

@@ -6,10 +6,14 @@ function App() {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const isBookReaderPage = location.pathname.match(/^\/books\/\d+\/read$/);
+  const isHomePage = location.pathname === '/';
+
+  // Eğer ana sayfadaysa veya auth sayfalarındaysa navbar'ı gösterme
+  const shouldShowNavbar = !isAuthPage && !isBookReaderPage && !isHomePage;
 
   return (
     <div className="app">
-      {!isAuthPage && !isBookReaderPage && <Navbar />}
+      {shouldShowNavbar && <Navbar />}
       <main className={`main-content ${isAuthPage ? 'auth-page' : ''} ${isBookReaderPage ? 'reader-page' : ''}`}>
         <Outlet />
       </main>

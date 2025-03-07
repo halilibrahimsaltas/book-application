@@ -8,10 +8,20 @@
 
 .dashboard-header {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
   padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
 }
 
 .dashboard-header h2 {
@@ -54,31 +64,26 @@
 
 .header-buttons {
   display: flex;
-  align-items: center;
-  min-width: 160px;
-  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .add-book-button {
   padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 500;
-  font-size: 0.95rem;
+  cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #3b82f6;
-  color: white;
-  white-space: nowrap;
 }
 
 .add-book-button:hover {
   background-color: #2563eb;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .logout-button {
@@ -326,5 +331,26 @@
   .books-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header-buttons {
+    width: 100%;
+  }
+
+  .add-book-button {
+    width: 100%;
+    justify-content: center;
   }
 } 

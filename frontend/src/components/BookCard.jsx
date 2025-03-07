@@ -32,24 +32,20 @@ const BookCard = ({ book, onDelete }) => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/default-book-cover.jpg';
     
-    // Eğer tam URL ise doğrudan kullan
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
+    // Konsola gelen path'i yazdır
+    console.log('Gelen imagePath:', imagePath);
     
-    // Eğer /api ile başlıyorsa, baseURL'i kullan
-    if (imagePath.startsWith('/api')) {
-      return `${import.meta.env.VITE_API_URL}${imagePath}`;
-    }
+    // Windows tarzı tam yolu temizle (C:\Users\... gibi)
+    const cleanPath = imagePath.replace(/^[A-Z]:\\.*\\uploads\\images\\/, '');
     
-    // Eğer uploads klasörü yolu varsa, statik dosya URL'ine dönüştür
-    if (imagePath.includes('uploads/images/')) {
-      const fileName = imagePath.split('uploads/images/').pop();
-      return `${import.meta.env.VITE_API_URL}/api/images/${fileName}`;
-    }
+    // Unix tarzı tam yolu temizle (/Users/.../uploads/images/ gibi)
+    const fileName = cleanPath.replace(/^.*\/uploads\/images\//, '');
     
-    // Diğer durumlar için /api ekle
-    return `${import.meta.env.VITE_API_URL}/api${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    // Sadece dosya adını kullan
+    const imageUrl = `${import.meta.env.VITE_API_URL}/api/images/${fileName}`;
+    console.log('Oluşturulan URL:', imageUrl);
+    
+    return imageUrl;
   };
 
   const handleReadClick = () => {
@@ -84,7 +80,11 @@ const BookCard = ({ book, onDelete }) => {
 
   const handleImageError = () => {
     setImageError(true);
-    console.log('Resim yüklenemedi:', book.imagePath);
+    console.error('Resim yükleme hatası:', {
+      originalPath: book.imagePath,
+      convertedUrl: getImageUrl(book.imagePath),
+      fileName: book.imagePath?.split(/[\/\\]/).pop()
+    });
   };
 
   return (

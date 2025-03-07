@@ -33,8 +33,9 @@
 
 .book-cover img.fallback-image {
   object-fit: contain;
-  padding: 1rem;
+  padding: 0.5rem;
   background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
 .book-cover:hover img:not(.fallback-image) {

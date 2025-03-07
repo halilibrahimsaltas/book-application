@@ -6,6 +6,7 @@ import SignUpPage from './pages/SignUpPage';
 import Dashboard from './pages/Dashboard';
 import BookReader from './pages/BookReader';
 import SavedWords from './pages/SavedWords';
+import Profile from './pages/Profile';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <Dashboard />
+      },
+      {
+        path: '/profile',
+        element: <Profile />
       },
       {
         path: '/books/:id/read',

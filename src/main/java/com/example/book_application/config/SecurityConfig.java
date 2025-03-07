@@ -37,20 +37,17 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .requestMatchers(
                 "/api/auth/**",
-                "/api/auth/login",
-                "/api/auth/register",
                 "/api/images/**",
                 "/api/translates/**",
                 "/error"
             ).permitAll()
             .requestMatchers(
-                "/api/users/profile",
-                "/api/users/profile/**"
+                "/api/users/profile/**",
+                "/api/books/**",
+                "/api/saved-words/**",
+                "/api/words/**",
+                "/api/book-progress/**"
             ).authenticated()
-            .requestMatchers("/api/books/**").authenticated()
-            .requestMatchers("/api/saved-words/**").authenticated()
-            .requestMatchers("/api/words/**").authenticated()
-            .requestMatchers("/api/book-progress/**").authenticated()
             .anyRequest().authenticated()
             .and()
             .sessionManagement()

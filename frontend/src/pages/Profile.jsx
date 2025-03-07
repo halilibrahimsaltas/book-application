@@ -15,6 +15,7 @@ const Profile = () => {
     confirmPassword: ''
   });
   const [successMessage, setSuccessMessage] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     fetchUserProfile();
@@ -45,15 +46,31 @@ const Profile = () => {
       ...prev,
       [name]: value
     }));
+    // Şifre alanları değiştiğinde hata mesajını temizle
+    if (name.includes('Password')) {
+      setPasswordError('');
+    }
+  };
+
+  const validatePasswords = () => {
+    if (formData.newPassword && formData.newPassword.length < 6) {
+      setPasswordError('Yeni şifre en az 6 karakter olmalıdır.');
+      return false;
+    }
+    if (formData.newPassword !== formData.confirmPassword) {
+      setPasswordError('Yeni şifreler eşleşmiyor.');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage('');
+    setPasswordError('');
 
-    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      setError('Yeni şifreler eşleşmiyor.');
+    if (formData.newPassword && !validatePasswords()) {
       return;
     }
 
@@ -71,9 +88,23 @@ const Profile = () => {
       await api.put('/api/users/profile', updateData);
       setSuccessMessage('Profil başarıyla güncellendi.');
       setEditMode(false);
+      
+      // Şifre alanlarını temizle
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
+      
       fetchUserProfile();
     } catch (error) {
-      setError(error.response?.data?.message || 'Profil güncellenirken bir hata oluştu.');
+      const errorMessage = error.response?.data?.message || 'Profil güncellenirken bir hata oluştu.';
+      if (errorMessage.includes('password')) {
+        setPasswordError(errorMessage);
+      } else {
+        setError(errorMessage);
+      }
     }
   };
 
@@ -103,12 +134,42 @@ const Profile = () => {
       <div className="profile-card">
         <div className="profile-header">
           <h2>Profil Bilgileri</h2>
-          <button
-            className={`edit-button ${editMode ? 'cancel' : ''}`}
-            onClick={() => setEditMode(!editMode)}
-          >
-            {editMode ? 'İptal' : 'Düzenle'}
-          </button>
+          <div className="header-actions">
+            {editMode ? (
+              <>
+                <button 
+                  type="button" 
+                  className="cancel-button"
+                  onClick={() => {
+                    setEditMode(false);
+                    setPasswordError('');
+                    setFormData(prev => ({
+                      ...prev,
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: ''
+                    }));
+                  }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="button" 
+                  className="save-button"
+                  onClick={handleSubmit}
+                >
+                  Kaydet
+                </button>
+              </>
+            ) : (
+              <button
+                className="edit-button"
+                onClick={() => setEditMode(true)}
+              >
+                Düzenle
+              </button>
+            )}
+          </div>
         </div>
 
         {successMessage && (
@@ -147,44 +208,46 @@ const Profile = () => {
           </div>
 
           {editMode && (
-            <>
-              <div className="password-section">
-                <h3>Şifre Değiştir</h3>
-                <div className="form-group">
-                  <label>Mevcut Şifre</label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={formData.currentPassword}
-                    onChange={handleInputChange}
-                  />
+            <div className="password-section">
+              <h3>Şifre Değiştir</h3>
+              {passwordError && (
+                <div className="password-error-message">
+                  {passwordError}
                 </div>
-
-                <div className="form-group">
-                  <label>Yeni Şifre</label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Yeni Şifre (Tekrar)</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                  />
-                </div>
+              )}
+              <div className="form-group">
+                <label>Mevcut Şifre</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleInputChange}
+                  placeholder="Mevcut şifrenizi girin"
+                />
               </div>
 
-              <button type="submit" className="save-button">
-                Değişiklikleri Kaydet
-              </button>
-            </>
+              <div className="form-group">
+                <label>Yeni Şifre</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                  placeholder="En az 6 karakter"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Yeni Şifre (Tekrar)</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  placeholder="Yeni şifrenizi tekrar girin"
+                />
+              </div>
+            </div>
           )}
         </form>
 
