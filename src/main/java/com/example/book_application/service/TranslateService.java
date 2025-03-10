@@ -2,11 +2,17 @@ package com.example.book_application.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import lombok.RequiredArgsConstructor;
 import com.example.book_application.model.*;
 import com.example.book_application.repository.*;
 import com.example.book_application.dto.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +24,7 @@ public class TranslateService {
     private final TRRepository trRepository;
     private final TypeRepository typeRepository;
     private final CategoryRepository categoryRepository;
+    private final RestTemplate restTemplate;
 
     @Transactional
     public TranslateResponse createTranslate(TranslateRequest request) {
@@ -127,5 +134,36 @@ public class TranslateService {
             translate.getType() != null ? translate.getType().getName() : null,
             translate.getCategory() != null ? translate.getCategory().getName() : null
         );
+    }
+
+    public String translateWithLibre(String text, String sourceLang, String targetLang) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("q", text);
+        requestBody.put("source", sourceLang);
+        requestBody.put("target", targetLang);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        try {
+            Map<String, String> response = restTemplate.postForObject("/translate", request, Map.class);
+            return response.get("translatedText");
+        } catch (Exception e) {
+            throw new RuntimeException("Çeviri sırasında bir hata oluştu: " + e.getMessage());
+        }
+    }
+
+    public TranslateResponse translateAndSave(String englishWord) {
+        // LibreTranslate API ile çeviri yap
+        String turkishWord = translateWithLibre(englishWord, "en", "tr");
+        
+        // Çeviriyi veritabanına kaydet
+        TranslateRequest request = new TranslateRequest();
+        request.setEnWord(englishWord);
+        request.setTrWord(turkishWord);
+        
+        return createTranslate(request);
     }
 } 

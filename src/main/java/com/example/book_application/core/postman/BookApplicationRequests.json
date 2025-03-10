@@ -594,6 +594,66 @@
               }
             ]
           }
+        },
+        {
+          "name": "LibreTranslate - Translate and Save",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8081/api/translates/libre?word=hello",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "translates", "libre"],
+              "query": [
+                {
+                  "key": "word",
+                  "value": "hello"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Kelimeyi LibreTranslate ile çevirip veritabanına kaydeder"
+          }
+        },
+        {
+          "name": "LibreTranslate - Raw Translation",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8081/api/translates/libre/raw?text=hello&from=en&to=tr",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "translates", "libre", "raw"],
+              "query": [
+                {
+                  "key": "text",
+                  "value": "hello"
+                },
+                {
+                  "key": "from",
+                  "value": "en"
+                },
+                {
+                  "key": "to",
+                  "value": "tr"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Metni LibreTranslate ile çevirir (veritabanına kaydetmez)"
+          }
         }
       ]
     },
