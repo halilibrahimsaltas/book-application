@@ -30,34 +30,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors().configurationSource(corsConfigurationSource())
-            .and()
-            .csrf()
-            .disable()
-            .authorizeHttpRequests()
-            .requestMatchers(
-                "/api/auth/register",
-                "/api/auth/login",
-                "/api/auth/**",
-                "/v3/api-docs/**",
-                "/swagger-ui/**",
-                "/swagger-ui.html",
-                "/error"
-            ).permitAll()
-            .requestMatchers(
-                "/api/users/profile/**",
-                "/api/books/**",
-                "/api/saved-words/**",
-                "/api/words/**",
-                "/api/translates/**",
-                "/api/translates/libre/**",
-                "/api/book-progress/**"
-            ).authenticated()
-            .anyRequest().authenticated()
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(requests -> requests
+                .requestMatchers(
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/api/auth/verify-email",
+                    "/api/auth/reset-password",
+                    "/api/auth/forgot-password",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/error"
+                ).permitAll()
+                .requestMatchers(
+                    "/api/users/profile/**",
+                    "/api/books/**",
+                    "/api/saved-words/**",
+                    "/api/words/**",
+                    "/api/translates/**",
+                    "/api/translates/libre/**",
+                    "/api/book-progress/**"
+                ).authenticated()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(management -> management
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -72,7 +72,7 @@ public class SecurityConfig {
             "http://127.0.0.1:5173"
         ));
         configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"
         ));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",
