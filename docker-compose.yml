@@ -1,0 +1,9 @@
+version: '3'
+services:
+  libretranslate:
+    image: libretranslate/libretranslate
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_LOAD_ONLY=en,tr  # Sadece İngilizce ve Türkçe dillerini yükle
+      - LT_UPDATE_MODELS=1  # Başlangıçta modelleri güncelle 

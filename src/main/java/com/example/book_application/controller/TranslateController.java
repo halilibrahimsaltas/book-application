@@ -1,6 +1,7 @@
 package com.example.book_application.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 import com.example.book_application.service.TranslateService;
 import com.example.book_application.dto.*;
@@ -79,6 +80,37 @@ public class TranslateController {
         } catch (Exception e) {
             log.error("Çeviri arama hatası '{}': {}", word, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/libre")
+    public ResponseEntity<?> translateWithLibre(@RequestParam String word) {
+        try {
+            log.debug("LibreTranslate ile çeviri yapılıyor ve kaydediliyor: {}", word);
+            TranslateResponse response = translateService.translateAndSave(word);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("LibreTranslate çeviri hatası: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Çeviri sırasında bir hata oluştu: " + e.getMessage());
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/libre/raw")
+    public ResponseEntity<?> translateOnly(
+            @RequestParam String text, 
+            @RequestParam(defaultValue = "en") String from,
+            @RequestParam(defaultValue = "tr") String to) {
+        try {
+            log.debug("LibreTranslate ile ham çeviri yapılıyor: {} ({} -> {})", text, from, to);
+            String translation = translateService.translateWithLibre(text, from, to);
+            return ResponseEntity.ok(translation);
+        } catch (Exception e) {
+            log.error("LibreTranslate ham çeviri hatası: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Çeviri sırasında bir hata oluştu: " + e.getMessage());
         }
     }
 } 

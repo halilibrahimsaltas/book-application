@@ -36,9 +36,12 @@ public class SecurityConfig {
             .disable()
             .authorizeHttpRequests()
             .requestMatchers(
+                "/api/auth/register",
+                "/api/auth/login",
                 "/api/auth/**",
-                "/api/images/**",
-                "/api/translates/**",
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
                 "/error"
             ).permitAll()
             .requestMatchers(
@@ -46,6 +49,8 @@ public class SecurityConfig {
                 "/api/books/**",
                 "/api/saved-words/**",
                 "/api/words/**",
+                "/api/translates/**",
+                "/api/translates/libre/**",
                 "/api/book-progress/**"
             ).authenticated()
             .anyRequest().authenticated()
